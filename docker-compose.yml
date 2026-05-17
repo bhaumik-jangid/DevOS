@@ -1,0 +1,82 @@
+version: "3.9"
+
+services:
+
+  # ─── PostgreSQL database ────────────────────────────────────────────────────
+  db:
+    image: postgres:15-alpine
+    # alpine images are smaller and have fewer attack vectors
+    container_name: devos_db
+    volumes:
+      # Named volume: data persists between container restarts
+      # Without this, your database is wiped every time you run docker compose down
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: devos
+      POSTGRES_USER: devos_user
+      POSTGRES_PASSWORD: devos_password
+    ports:
+      # Expose to host so you can connect with a DB client (DBeaver, TablePlus)
+      # In production: remove this — DB should never be publicly accessible
+      - "5433:5432"
+    healthcheck:
+      # Compose waits for this to pass before starting dependent services
+      test: ["CMD-SHELL", "pg_isready -U devos_user -d devos"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── Django backend ─────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: devos_backend
+    volumes:
+      # Mount source code so changes are reflected without rebuilding
+      - ./backend:/app
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.development
+    env_file:
+      # Load all variables from backend/.env
+      - ./backend/.env
+    depends_on:
+      db:
+        # Only start after the DB healthcheck passes
+        condition: service_healthy
+    # Django is NOT exposed to the host — only accessible through Nginx
+
+  # ─── Next.js frontend ───────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: devos_frontend
+    volumes:
+      - ./frontend:/app
+      # Prevent host node_modules from overriding container's node_modules
+      - /app/node_modules
+      - /app/.next
+    env_file:
+      - ./frontend/.env.local
+    depends_on:
+      - backend
+    # Next.js is NOT exposed to the host — only accessible through Nginx
+
+  # ─── Nginx reverse proxy ────────────────────────────────────────────────────
+  nginx:
+    image: nginx:alpine
+    container_name: devos_nginx
+    ports:
+      # This is the ONLY port exposed to your machine
+      - "8090:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      # :ro = read-only mount — Nginx should never write to the config
+    depends_on:
+      - backend
+      - frontend
+
+volumes:
+  # Docker-managed named volume for database persistence
+  postgres_data:
