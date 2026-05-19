@@ -9,6 +9,16 @@ class Project(models.Model):
         ("in_progress", "In Progress"),
     ]
 
+    HOSTING_CHOICES = [
+        ("vercel", "Vercel"),
+        ("render", "Render"),
+        ("railway", "Railway"),
+        ("aws", "AWS"),
+        ("digitalocean", "DigitalOcean"),
+        ("vps", "VPS"),
+        ("other", "Other"),
+    ]
+
     name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True)
     description = models.TextField()
@@ -18,7 +28,17 @@ class Project(models.Model):
     live_url = models.URLField(blank=True)
     cover_image = models.ImageField(upload_to="projects/", null=True, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="active")
-    hosting_provider = models.CharField(max_length=50, blank=True)
+    hosting_provider = models.CharField(max_length=20, choices=HOSTING_CHOICES, blank=True)
+
+    # Registry fields
+    frontend_url = models.URLField(blank=True)
+    backend_url = models.URLField(blank=True)
+    health_endpoint = models.URLField(blank=True)
+    deployment_type = models.CharField(max_length=50, blank=True)
+    docker_enabled = models.BooleanField(default=False)
+    ci_cd_enabled = models.BooleanField(default=False)
+    notes = models.TextField(blank=True)
+
     is_featured = models.BooleanField(default=False)
     is_public = models.BooleanField(default=True)
     order = models.IntegerField(default=0)
