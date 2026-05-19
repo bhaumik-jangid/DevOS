@@ -33,7 +33,7 @@ export function ExperienceSection({ experience }: { experience: Experience[] }) 
                   )}
                 </div>
               </div>
-              <p className="text-zinc-500 text-sm leading-relaxed">{exp.description}</p>
+              <p className="text-zinc-500 text-sm leading-relaxed">{exp.description}</p>  
             </div>
           ))}
         </div>
