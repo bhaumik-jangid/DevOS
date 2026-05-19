@@ -1,0 +1,56 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  notify-start:
+    runs-on: ubuntu-latest
+    outputs:
+      deployment_id: ${{ steps.create.outputs.deployment_id }}
+    steps:
+      - name: Register deployment start
+        id: create
+        run: |
+          RESPONSE=$(curl -s -X POST ${{ secrets.DEVOS_API_URL }}/deployments/ \
+            -H "Authorization: Bearer ${{ secrets.DEVOS_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "project": ${{ secrets.DEVOS_PROJECT_ID }},
+              "status": "in_progress",
+              "source": "github_actions",
+              "branch": "${{ github.ref_name }}",
+              "commit_hash": "${{ github.sha }}",
+              "commit_message": "${{ github.event.head_commit.message }}",
+              "triggered_by": "${{ github.actor }}"
+            }')
+          echo "deployment_id=$(echo $RESPONSE | python3 -c 'import sys,json; print(json.load(sys.stdin)[\"id\"])')" >> $GITHUB_OUTPUT
+
+  deploy-backend:
+    needs: notify-start
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to Render
+        run: |
+          curl -X POST "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys" \
+            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+            -H "Content-Type: application/json"
+
+  notify-finish:
+    needs: [notify-start, deploy-backend]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Update deployment status
+        run: |
+          STATUS="success"
+          if [ "${{ needs.deploy-backend.result }}" != "success" ]; then
+            STATUS="failed"
+          fi
+          curl -s -X PATCH ${{ secrets.DEVOS_API_URL }}/deployments/${{ needs.notify-start.outputs.deployment_id }}/finish/ \
+            -H "Authorization: Bearer ${{ secrets.DEVOS_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d "{\"status\": \"$STATUS\"}"

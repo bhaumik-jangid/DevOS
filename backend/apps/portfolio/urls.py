@@ -1,7 +1,8 @@
 from django.urls import path
 from .views import (
     SkillListView, ExperienceListView,
-    CertificationListView, BlogPostListView, BlogPostDetailView
+    CertificationListView, BlogPostListView,
+    BlogPostDetailView, ContactFormView
 )
 
 urlpatterns = [
@@ -10,4 +11,5 @@ urlpatterns = [
     path("certifications/", CertificationListView.as_view()),
     path("blog/", BlogPostListView.as_view()),
     path("blog/<slug:slug>/", BlogPostDetailView.as_view()),
+    path("contact/", ContactFormView.as_view()),
 ]

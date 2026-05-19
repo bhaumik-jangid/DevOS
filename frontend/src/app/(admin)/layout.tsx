@@ -22,7 +22,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div className="min-h-screen bg-[#0e0e10] text-white flex">
       <Sidebar />
-      <div className="flex-1 flex flex-col min-w-0">
+      {/* pt-14 on mobile to clear the fixed top bar, 0 on desktop */}
+      <div className="flex-1 flex flex-col min-w-0 pt-14 md:pt-0">
         {children}
       </div>
     </div>

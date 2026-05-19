@@ -8,8 +8,6 @@ TIMEOUT_SECONDS = 10
 
 
 def check_project(project: Project) -> HealthCheck:
-    """Ping a single project health endpoint and record the result."""
-
     if not project.health_endpoint:
         return None
 
@@ -59,7 +57,7 @@ def check_project(project: Project) -> HealthCheck:
 
 
 def _handle_incident(project: Project, is_healthy: bool, status: str):
-    """Open or resolve an incident based on current health."""
+    from apps.alerts.services import alert_downtime, alert_recovery
 
     open_incident = Incident.objects.filter(
         project=project,
@@ -67,23 +65,23 @@ def _handle_incident(project: Project, is_healthy: bool, status: str):
     ).first()
 
     if not is_healthy and not open_incident:
-        # Project just went down — open a new incident
         Incident.objects.create(
             project=project,
             severity="high" if status == "timeout" else "medium",
-            description=f"Project health check failed with status: {status}",
+            description=f"Health check failed with status: {status}",
         )
+        alert_downtime(project)
 
     elif is_healthy and open_incident:
-        # Project recovered — resolve the incident
         open_incident.resolved_at = timezone.now()
         open_incident.is_resolved = True
         open_incident.save()
 
+        downtime_minutes = open_incident.duration_minutes
+        alert_recovery(project, downtime_minutes)
+
 
 def run_all_checks() -> dict:
-    """Run health checks for all projects that have a health endpoint."""
-
     projects = Project.objects.filter(
         is_public=True
     ).exclude(health_endpoint="")
