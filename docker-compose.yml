@@ -77,6 +77,25 @@ services:
       - backend
       - frontend
 
+  # ─── Cron Scheduler ────────────────────────────────────────────────────────
+  scheduler:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: devos_scheduler
+    command: >
+      sh -c "while true; do
+        python manage.py run_health_checks;
+        sleep 300;
+      done"
+    env_file:
+      - ./backend/.env
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.development
+    depends_on:
+      db:
+        condition: service_healthy
+
 volumes:
   # Docker-managed named volume for database persistence
   postgres_data:
