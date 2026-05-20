@@ -1,11 +1,14 @@
 from django.urls import path
 from .views import (
-    SkillListView, ExperienceListView,
-    CertificationListView, BlogPostListView,
-    BlogPostDetailView, ContactFormView
+    ProfileView, AcademicListView, AchievementListView,
+    SkillListView, ExperienceListView, CertificationListView,
+    BlogPostListView, BlogPostDetailView, ContactFormView
 )
 
 urlpatterns = [
+    path("profile/", ProfileView.as_view()),
+    path("academic/", AcademicListView.as_view()),
+    path("achievements/", AchievementListView.as_view()),
     path("skills/", SkillListView.as_view()),
     path("experience/", ExperienceListView.as_view()),
     path("certifications/", CertificationListView.as_view()),

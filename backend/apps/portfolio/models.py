@@ -1,7 +1,90 @@
 from django.db import models
 
-# Create your models here.
-from django.db import models
+
+class Profile(models.Model):
+    """Single-row table — your personal profile."""
+    name = models.CharField(max_length=100)
+    tagline = models.CharField(max_length=200)
+    bio = models.TextField()
+    email = models.EmailField()
+    phone = models.CharField(max_length=20, blank=True)
+    location = models.CharField(max_length=100, blank=True)
+    github_url = models.URLField(blank=True)
+    linkedin_url = models.URLField(blank=True)
+    twitter_url = models.URLField(blank=True)
+    resume = models.FileField(upload_to="resume/", null=True, blank=True)
+    photo_primary = models.ImageField(upload_to="photos/", null=True, blank=True)
+    photo_secondary = models.ImageField(upload_to="photos/", null=True, blank=True)
+    available_for_work = models.BooleanField(default=True)
+    years_of_experience = models.IntegerField(default=0)
+
+    # DSA stats
+    leetcode_username = models.CharField(max_length=100, blank=True)
+    leetcode_solved = models.IntegerField(default=0)
+    leetcode_easy = models.IntegerField(default=0)
+    leetcode_medium = models.IntegerField(default=0)
+    leetcode_hard = models.IntegerField(default=0)
+    codeforces_username = models.CharField(max_length=100, blank=True)
+    codeforces_rating = models.IntegerField(default=0)
+    codechef_username = models.CharField(max_length=100, blank=True)
+    total_dsa_solved = models.IntegerField(default=0)
+
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Profile"
+
+    def __str__(self):
+        return self.name
+
+    @classmethod
+    def get_profile(cls):
+        return cls.objects.first()
+
+
+class Academic(models.Model):
+    LEVEL_CHOICES = [
+        ("10th", "10th Standard"),
+        ("12th", "12th Standard"),
+        ("diploma", "Diploma"),
+        ("btech", "B.Tech"),
+        ("mtech", "M.Tech"),
+        ("other", "Other"),
+    ]
+
+    level = models.CharField(max_length=20, choices=LEVEL_CHOICES)
+    institution = models.CharField(max_length=200)
+    board_or_university = models.CharField(max_length=200, blank=True)
+    field_of_study = models.CharField(max_length=100, blank=True)
+    percentage_or_cgpa = models.CharField(max_length=20)
+    scale = models.CharField(max_length=20, default="percentage",
+                             help_text="e.g. percentage, 10-point CGPA, 4-point CGPA")
+    start_year = models.IntegerField()
+    end_year = models.IntegerField(null=True, blank=True)
+    is_current = models.BooleanField(default=False)
+    order = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ["order", "start_year"]
+
+    def __str__(self):
+        return f"{self.level} — {self.institution}"
+
+
+class Achievement(models.Model):
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    date = models.DateField(null=True, blank=True)
+    url = models.URLField(blank=True)
+    icon_name = models.CharField(max_length=50, blank=True)
+    order = models.IntegerField(default=0)
+    is_visible = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["order", "-date"]
+
+    def __str__(self):
+        return self.title
 
 
 class Skill(models.Model):
@@ -14,8 +97,8 @@ class Skill(models.Model):
     ]
     name = models.CharField(max_length=50)
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
-    icon_name = models.CharField(max_length=50, blank=True, help_text="Lucide icon name")
-    proficiency = models.IntegerField(default=80, help_text="0-100")
+    icon_name = models.CharField(max_length=50, blank=True)
+    proficiency = models.IntegerField(default=80)
     order = models.IntegerField(default=0)
     is_visible = models.BooleanField(default=True)
 
@@ -81,7 +164,6 @@ class BlogPost(models.Model):
 
 
 class SiteConfig(models.Model):
-    """Single-row table for global portfolio config."""
     key = models.CharField(max_length=100, unique=True)
     value = models.TextField()
 
@@ -90,10 +172,3 @@ class SiteConfig(models.Model):
 
     def __str__(self):
         return self.key
-
-    @classmethod
-    def get(cls, key, default=""):
-        try:
-            return cls.objects.get(key=key).value
-        except cls.DoesNotExist:
-            return default

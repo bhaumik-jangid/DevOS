@@ -53,15 +53,18 @@ services:
       dockerfile: Dockerfile
     container_name: devos_frontend
     volumes:
-      - ./frontend:/app
-      # Prevent host node_modules from overriding container's node_modules
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+      - ./frontend/next.config.ts:/app/next.config.ts
+      - ./frontend/tailwind.config.ts:/app/tailwind.config.ts
+      - ./frontend/tsconfig.json:/app/tsconfig.json
+      - ./frontend/postcss.config.mjs:/app/postcss.config.mjs
+      - ./frontend/package.json:/app/package.json
       - /app/node_modules
-      - /app/.next
     env_file:
       - ./frontend/.env.local
     depends_on:
       - backend
-    # Next.js is NOT exposed to the host — only accessible through Nginx
 
   # ─── Nginx reverse proxy ────────────────────────────────────────────────────
   nginx:
@@ -97,5 +100,5 @@ services:
         condition: service_healthy
 
 volumes:
-  # Docker-managed named volume for database persistence
   postgres_data:
+  frontend_node_modules:

@@ -1,4 +1,7 @@
-import { Project, Skill, Experience, Certification, BlogPost } from "@/types/portfolio"
+import {
+  Project, Skill, Experience, Certification,
+  BlogPost, Profile, Academic, Achievement
+} from "@/types/portfolio"
 
 const API = typeof window === "undefined"
   ? process.env.INTERNAL_API_URL || "http://backend:8000/api/v1"
@@ -7,18 +10,20 @@ const API = typeof window === "undefined"
 async function fetcher<T>(path: string): Promise<T> {
   try {
     const res = await fetch(`${API}${path}`, { next: { revalidate: 0 } })
-    if (!res.ok) return [] as unknown as T
+    if (!res.ok) return (Array.isArray([]) ? [] : {}) as unknown as T
     const data = await res.json()
-    // DRF pagination wraps results — unwrap if paginated
     if (data && typeof data === "object" && "results" in data) {
       return data.results as T
     }
     return data as T
   } catch {
-    return [] as unknown as T
+    return (Array.isArray([]) ? [] : {}) as unknown as T
   }
 }
 
+export const getProfile = () => fetcher<Profile>("/portfolio/profile/")
+export const getAcademic = () => fetcher<Academic[]>("/portfolio/academic/")
+export const getAchievements = () => fetcher<Achievement[]>("/portfolio/achievements/")
 export const getFeaturedProjects = () => fetcher<Project[]>("/projects/?featured=true")
 export const getProjects = () => fetcher<Project[]>("/projects/")
 export const getProject = (slug: string) => fetcher<Project>(`/projects/${slug}/`)

@@ -117,3 +117,6 @@ SIMPLE_JWT = {
 
 TELEGRAM_BOT_TOKEN = config("TELEGRAM_BOT_TOKEN", default="")
 TELEGRAM_CHAT_ID = config("TELEGRAM_CHAT_ID", default="")
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"

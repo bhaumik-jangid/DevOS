@@ -2,11 +2,38 @@ from rest_framework import generics, status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .models import Skill, Experience, Certification, BlogPost
-from .serializers import (
-    SkillSerializer, ExperienceSerializer,
-    CertificationSerializer, BlogPostSerializer, BlogPostDetailSerializer
+
+from .models import (
+    Profile, Academic, Achievement, Skill,
+    Experience, Certification, BlogPost
 )
+from .serializers import (
+    ProfileSerializer, AcademicSerializer, AchievementSerializer,
+    SkillSerializer, ExperienceSerializer, CertificationSerializer,
+    BlogPostSerializer, BlogPostDetailSerializer
+)
+
+
+class ProfileView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        profile = Profile.objects.first()
+        if not profile:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        return Response(ProfileSerializer(profile).data)
+
+
+class AcademicListView(generics.ListAPIView):
+    permission_classes = [AllowAny]
+    serializer_class = AcademicSerializer
+    queryset = Academic.objects.all()
+
+
+class AchievementListView(generics.ListAPIView):
+    permission_classes = [AllowAny]
+    serializer_class = AchievementSerializer
+    queryset = Achievement.objects.filter(is_visible=True)
 
 
 class SkillListView(generics.ListAPIView):
@@ -62,18 +89,10 @@ class ContactFormView(APIView):
             )
 
         from apps.alerts.services import alert_contact_form
-        alert = alert_contact_form(
-            name=name,
-            email=email,
-            message_body=message,
-            phone=phone,
-        )
-
-        if alert.status == "failed":
-            # Still return success to the user — don't expose internal failures
-            pass
+        alert_contact_form(name=name, email=email,
+                           message_body=message, phone=phone)
 
         return Response(
-            {"detail": "Message sent successfully. I will get back to you soon."},
+            {"detail": "Message sent. I will get back to you soon."},
             status=status.HTTP_200_OK
         )

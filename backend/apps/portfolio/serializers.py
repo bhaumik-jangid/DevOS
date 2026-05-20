@@ -1,5 +1,26 @@
 from rest_framework import serializers
-from .models import Skill, Experience, Certification, BlogPost
+from .models import (
+    Profile, Academic, Achievement, Skill,
+    Experience, Certification, BlogPost
+)
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        exclude = ["updated_at"]
+
+
+class AcademicSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Academic
+        fields = "__all__"
+
+
+class AchievementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Achievement
+        fields = "__all__"
 
 
 class SkillSerializer(serializers.ModelSerializer):
@@ -30,8 +51,8 @@ class BlogPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = BlogPost
         fields = [
-            "id", "title", "slug", "excerpt", "cover_image",
-            "tags", "published_at"
+            "id", "title", "slug", "excerpt",
+            "cover_image", "tags", "published_at"
         ]
 
 
