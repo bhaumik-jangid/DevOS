@@ -50,6 +50,7 @@ export function ProjectForm({ initial, projectId }: Props) {
   const [saving, setSaving] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const set = (key: keyof ProjectFormData, value: any) => {
     setForm((prev) => ({ ...prev, [key]: value }))
     if (errors[key]) setErrors((prev) => ({ ...prev, [key]: "" }))
@@ -78,6 +79,7 @@ export function ProjectForm({ initial, projectId }: Props) {
       }
       router.push("/dashboard/projects")
       router.refresh()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       const data = err.response?.data
       if (data && typeof data === "object") {

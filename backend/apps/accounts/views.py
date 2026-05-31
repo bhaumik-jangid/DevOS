@@ -1,4 +1,6 @@
 from django.contrib.auth import get_user_model
+from django.utils.decorators import method_decorator
+from django_ratelimit.decorators import ratelimit
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -14,13 +16,12 @@ User = get_user_model()
 class LoginView(APIView):
     permission_classes = [AllowAny]
 
+    @method_decorator(ratelimit(key="ip", rate="10/m", method="POST", block=True))
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
         user = serializer.validated_data["user"]
         refresh = RefreshToken.for_user(user)
-
         return Response({
             "access": str(refresh.access_token),
             "refresh": str(refresh),
@@ -35,7 +36,7 @@ class LogoutView(APIView):
         refresh_token = request.data.get("refresh")
         if not refresh_token:
             return Response(
-                {"detail": "Refresh token required"},
+                {"detail": "Refresh token required."},
                 status=status.HTTP_400_BAD_REQUEST
             )
         try:
@@ -43,10 +44,10 @@ class LogoutView(APIView):
             token.blacklist()
         except TokenError:
             return Response(
-                {"detail": "Invalid or expired token"},
+                {"detail": "Invalid or expired token."},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        return Response({"detail": "Logged out successfully"}, status=status.HTTP_200_OK)
+        return Response({"detail": "Logged out successfully."})
 
 
 class MeView(APIView):
@@ -56,7 +57,9 @@ class MeView(APIView):
         return Response(UserSerializer(request.user).data)
 
     def patch(self, request):
-        serializer = UserSerializer(request.user, data=request.data, partial=True)
+        serializer = UserSerializer(
+            request.user, data=request.data, partial=True
+        )
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)

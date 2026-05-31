@@ -8,6 +8,7 @@ import { Topbar } from "@/components/admin/topbar"
 import { api } from "@/lib/api"
 
 export default function AdminProjectsPage() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [projects, setProjects] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 

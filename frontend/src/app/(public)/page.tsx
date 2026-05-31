@@ -10,6 +10,7 @@ import { AcademicSection } from "@/components/public/academic-section"
 import { DSASection } from "@/components/public/dsa-section"
 import { AchievementsSection } from "@/components/public/achievements-section"
 import { CertificationsSection } from "@/components/public/certifications-section"
+import { GitHubSection } from "@/components/public/github-section"
 import { ContactForm } from "@/components/public/contact-form"
 
 export default async function HomePage() {
@@ -36,6 +37,7 @@ export default async function HomePage() {
       <DSASection profile={profile} />
       <AchievementsSection achievements={achievements} />
       <CertificationsSection certs={certifications} />
+      <GitHubSection />
 
       <section className="py-12 sm:py-16 px-4 sm:px-6 max-w-5xl mx-auto">
         <p className="text-xs text-amber-500 font-mono uppercase tracking-widest mb-1">

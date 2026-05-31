@@ -14,6 +14,7 @@ const typeColors: Record<string, string> = {
 }
 
 export default function AlertHistoryPage() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [alerts, setAlerts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 

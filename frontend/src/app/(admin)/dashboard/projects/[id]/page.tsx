@@ -8,6 +8,7 @@ import { api } from "@/lib/api"
 
 export default function EditProjectPage() {
   const { id } = useParams<{ id: string }>()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [project, setProject] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 

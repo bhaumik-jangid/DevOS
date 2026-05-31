@@ -1,5 +1,7 @@
 "use client"
 
+import type { DeploymentRow, ProjectRow } from "@/types/admin"
+
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import {
@@ -15,7 +17,8 @@ import { staggerContainer, staggerItem } from "@/lib/animations"
 
 export default function DashboardPage() {
   const { user } = useAuthStore()
-  const [projects, setProjects] = useState<any[]>([])
+  const [projects, setProjects] = useState<ProjectRow[]>([])
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [deploymentStats, setDeploymentStats] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
@@ -30,7 +33,6 @@ export default function DashboardPage() {
   }, [])
 
   const active = projects.filter((p) => p.status === "active").length
-  const featured = projects.filter((p) => p.is_featured).length
 
   return (
     <>
@@ -134,7 +136,7 @@ export default function DashboardPage() {
               <p className="text-sm font-medium text-red-400">Recent deployment failures</p>
             </div>
             <div className="divide-y divide-zinc-800/40">
-              {deploymentStats.recent_failed.map((dep: any) => (
+              {deploymentStats.recent_failed.map((dep: DeploymentRow) => (
                 <div key={dep.id} className="px-4 sm:px-5 py-3">
                   <div className="flex items-center justify-between">
                     <p className="text-sm text-white">{dep.project_name}</p>

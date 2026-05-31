@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { fadeUp } from "@/lib/animations"
+
 
 interface AnimatedSectionProps {
   children: React.ReactNode

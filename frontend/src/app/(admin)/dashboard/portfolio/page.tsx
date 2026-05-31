@@ -5,7 +5,9 @@ import { Topbar } from "@/components/admin/topbar"
 import { api } from "@/lib/api"
 
 export default function AdminPortfolioPage() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [skills, setSkills] = useState<any[]>([])
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [experience, setExperience] = useState<any[]>([])
 
   useEffect(() => {

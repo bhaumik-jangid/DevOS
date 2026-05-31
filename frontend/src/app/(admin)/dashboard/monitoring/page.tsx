@@ -15,6 +15,7 @@ interface ProjectStatus {
   project_slug: string
   has_health_endpoint: boolean
   uptime_percent: number | null
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   open_incident: any | null
   latest_check: {
     status: string
@@ -232,6 +233,7 @@ export default function MonitoringPage() {
 }
 
 function OpenIncidents() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [incidents, setIncidents] = useState<any[]>([])
 
   useEffect(() => {

@@ -120,3 +120,18 @@ TELEGRAM_CHAT_ID = config("TELEGRAM_CHAT_ID", default="")
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+# Security
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = "DENY"
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
+
+# Rate limiting
+RATELIMIT_USE_CACHE = "default"
+RATELIMIT_FAIL_OPEN = False
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+    }
+}

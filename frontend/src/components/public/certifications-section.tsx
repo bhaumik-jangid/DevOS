@@ -4,7 +4,6 @@ import { BadgeCheck, ExternalLink } from "lucide-react"
 export function CertificationsSection({ certs }: { certs: Certification[] }) {
   if (!certs.length) return null
 
-  const API = process.env.NEXT_PUBLIC_API_URL?.replace("/api/v1", "") || ""
 
   return (
     <section className="py-12 sm:py-16 px-4 sm:px-6 max-w-5xl mx-auto">

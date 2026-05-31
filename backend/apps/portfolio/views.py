@@ -1,3 +1,5 @@
+from django.utils.decorators import method_decorator
+from django_ratelimit.decorators import ratelimit
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -70,27 +72,36 @@ class BlogPostDetailView(generics.RetrieveAPIView):
 class ContactFormView(APIView):
     permission_classes = [AllowAny]
 
+    @method_decorator(ratelimit(key="ip", rate="5/h", method="POST", block=True))
     def post(self, request):
         name = request.data.get("name", "").strip()
         email = request.data.get("email", "").strip()
         message = request.data.get("message", "").strip()
         phone = request.data.get("phone", "").strip()
 
-        if not name or not email or not message:
-            return Response(
-                {"detail": "Name, email, and message are required."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        if len(message) < 10:
-            return Response(
-                {"detail": "Message is too short."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        errors = {}
+        if not name:
+            errors["name"] = "Name is required."
+        if not email:
+            errors["email"] = "Email is required."
+        if not message:
+            errors["message"] = "Message is required."
+        elif len(message) < 10:
+            errors["message"] = "Message must be at least 10 characters."
+        if errors:
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
 
         from apps.alerts.services import alert_contact_form
-        alert_contact_form(name=name, email=email,
-                           message_body=message, phone=phone)
+        alert = alert_contact_form(
+            name=name, email=email,
+            message_body=message, phone=phone
+        )
+
+        if alert.status == "failed":
+            import logging
+            logging.getLogger(__name__).error(
+                f"Contact form alert failed for {email}: {alert.error_message}"
+            )
 
         return Response(
             {"detail": "Message sent. I will get back to you soon."},

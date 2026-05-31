@@ -6,7 +6,8 @@ import { usePathname } from "next/navigation"
 import {
   Terminal, LayoutDashboard, FolderKanban,
   Activity, Layers, LogOut, ChevronRight,
-  Bell, Rocket, Menu, X
+  Bell, Rocket, Menu, X,
+  BarChart2
 } from "lucide-react"
 import { useAuthStore } from "@/lib/auth-store"
 import { useRouter } from "next/navigation"
@@ -18,6 +19,7 @@ const navItems = [
   { href: "/dashboard/deployments", label: "Deployments", icon: Rocket, exact: false },
   { href: "/dashboard/monitoring", label: "Monitoring", icon: Activity, exact: false },
   { href: "/dashboard/monitoring/alerts", label: "Alerts", icon: Bell, exact: false },
+  { href: "/dashboard/analytics", label: "Analytics", icon: BarChart2, exact: false },
   { href: "/dashboard/portfolio", label: "Portfolio", icon: Layers, exact: false },
 ]
 
@@ -26,8 +28,11 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   const router = useRouter()
   const { user, logout } = useAuthStore()
 
-  const isActive = (href: string, exact: boolean) =>
-    exact ? pathname === href : pathname.startsWith(href)
+  const isActive = (href: string, exact: boolean) => {
+    if (exact) return pathname === href
+
+    return pathname === href || pathname.startsWith(`${href}/`)
+  }
 
   const handleLogout = async () => {
     await logout()
@@ -46,9 +51,9 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
               className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm
                           transition-colors group
                           ${active
-                            ? "bg-zinc-800 text-white"
-                            : "text-zinc-500 hover:text-white hover:bg-zinc-800/50"
-                          }`}>
+                  ? "bg-zinc-800 text-white"
+                  : "text-zinc-500 hover:text-white hover:bg-zinc-800/50"
+                }`}>
               <item.icon className={`w-4 h-4 shrink-0 ${active ? "text-amber-500" : ""}`} />
               {item.label}
               {active && <ChevronRight className="w-3 h-3 ml-auto text-zinc-600" />}

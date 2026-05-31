@@ -1,56 +1,54 @@
-name: Deploy
+name: Deploy to Production
 
 on:
   push:
     branches: [main]
 
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
 jobs:
-  notify-start:
-    runs-on: ubuntu-latest
-    outputs:
-      deployment_id: ${{ steps.create.outputs.deployment_id }}
-    steps:
-      - name: Register deployment start
-        id: create
-        run: |
-          RESPONSE=$(curl -s -X POST ${{ secrets.DEVOS_API_URL }}/deployments/ \
-            -H "Authorization: Bearer ${{ secrets.DEVOS_TOKEN }}" \
-            -H "Content-Type: application/json" \
-            -d '{
-              "project": ${{ secrets.DEVOS_PROJECT_ID }},
-              "status": "in_progress",
-              "source": "github_actions",
-              "branch": "${{ github.ref_name }}",
-              "commit_hash": "${{ github.sha }}",
-              "commit_message": "${{ github.event.head_commit.message }}",
-              "triggered_by": "${{ github.actor }}"
-            }')
-          echo "deployment_id=$(echo $RESPONSE | python3 -c 'import sys,json; print(json.load(sys.stdin)[\"id\"])')" >> $GITHUB_OUTPUT
-
   deploy-backend:
-    needs: notify-start
+    runs-on: ubuntu-latest
+    if: contains(github.event.head_commit.modified, 'backend/') || contains(github.event.head_commit.added, 'backend/')
+    steps:
+      - name: Trigger Render deploy
+        run: |
+          curl -s -X POST \
+            "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys" \
+            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d '{"clearCache": false}'
+
+  deploy-frontend:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Vercel deploys automatically on push
+        run: echo "Vercel connected to repo — deploys on push to main automatically"
 
-      - name: Deploy to Render
-        run: |
-          curl -X POST "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys" \
-            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
-            -H "Content-Type: application/json"
-
-  notify-finish:
-    needs: [notify-start, deploy-backend]
+  notify:
     runs-on: ubuntu-latest
+    needs: [deploy-backend]
     if: always()
     steps:
-      - name: Update deployment status
+      - name: Send Telegram notification
         run: |
-          STATUS="success"
-          if [ "${{ needs.deploy-backend.result }}" != "success" ]; then
-            STATUS="failed"
+          STATUS="${{ needs.deploy-backend.result }}"
+          COMMIT="${{ github.sha }}"
+          MESSAGE="${{ github.event.head_commit.message }}"
+          ACTOR="${{ github.actor }}"
+
+          if [ "$STATUS" = "success" ]; then
+            EMOJI="✅"
+          else
+            EMOJI="🚨"
           fi
-          curl -s -X PATCH ${{ secrets.DEVOS_API_URL }}/deployments/${{ needs.notify-start.outputs.deployment_id }}/finish/ \
-            -H "Authorization: Bearer ${{ secrets.DEVOS_TOKEN }}" \
+
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
             -H "Content-Type: application/json" \
-            -d "{\"status\": \"$STATUS\"}"
+            -d "{
+              \"chat_id\": \"${{ secrets.TELEGRAM_CHAT_ID }}\",
+              \"text\": \"${EMOJI} <b>Deploy ${STATUS}</b>\\n\\nCommit: ${COMMIT:0:7}\\nMessage: ${MESSAGE}\\nBy: ${ACTOR}\",
+              \"parse_mode\": \"HTML\"
+            }"

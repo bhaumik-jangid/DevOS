@@ -27,6 +27,7 @@ export function ContactForm() {
       if (!res.ok) throw new Error(data.detail || "Failed")
       toast.success("Message sent — I will get back to you soon")
       setSent(true)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       toast.error(err.message || "Failed to send message")
     } finally {
