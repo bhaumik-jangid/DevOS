@@ -1,6 +1,7 @@
 import {
   getProfile, getFeaturedProjects, getSkills,
-  getExperience, getAcademic, getAchievements, getCertifications
+  getExperience, getAcademic, getAchievements,
+  getCertifications, getSiteConfig
 } from "@/lib/portfolio-api"
 import { HeroSection } from "@/components/public/hero-section"
 import { FeaturedProjects } from "@/components/public/featured-projects"
@@ -12,11 +13,12 @@ import { AchievementsSection } from "@/components/public/achievements-section"
 import { CertificationsSection } from "@/components/public/certifications-section"
 import { GitHubSection } from "@/components/public/github-section"
 import { ContactForm } from "@/components/public/contact-form"
+import { VideoBubble } from "@/components/public/video-bubble"
 
 export default async function HomePage() {
   const [
     profile, projects, skills, experience,
-    academics, achievements, certifications
+    academics, achievements, certifications, config
   ] = await Promise.all([
     getProfile(),
     getFeaturedProjects(),
@@ -25,11 +27,12 @@ export default async function HomePage() {
     getAcademic(),
     getAchievements(),
     getCertifications(),
+    getSiteConfig(),
   ])
 
   return (
     <>
-      <HeroSection profile={profile} />
+      <HeroSection profile={profile} config={config} />
       <FeaturedProjects projects={projects} />
       <SkillsSection skills={skills} />
       <ExperienceSection experience={experience} />
@@ -39,19 +42,22 @@ export default async function HomePage() {
       <CertificationsSection certs={certifications} />
       <GitHubSection />
 
-      <section className="py-12 sm:py-16 px-4 sm:px-6 max-w-5xl mx-auto">
+      <section id="contact" className="py-16 px-4 sm:px-6 max-w-5xl mx-auto">
         <p className="text-xs text-amber-500 font-mono uppercase tracking-widest mb-1">
           Contact
         </p>
         <h2 className="text-2xl font-medium text-white mb-2">Get in touch</h2>
         <p className="text-zinc-500 text-sm mb-8 max-w-md">
-          Open to freelance projects, full-time roles, and interesting collaborations.
+          Open to freelance projects, full-time roles, and collaborations.
           Messages go directly to my Telegram.
         </p>
         <div className="max-w-lg">
           <ContactForm />
         </div>
       </section>
+
+      {/* Floating video bubble — only renders if hero_video_url is set in SiteConfig */}
+      <VideoBubble videoUrl={config.hero_video_url} />
     </>
   )
 }

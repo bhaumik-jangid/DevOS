@@ -20,6 +20,7 @@ const navItems = [
   { href: "/dashboard/monitoring", label: "Monitoring", icon: Activity, exact: false },
   { href: "/dashboard/monitoring/alerts", label: "Alerts", icon: Bell, exact: false },
   { href: "/dashboard/analytics", label: "Analytics", icon: BarChart2, exact: false },
+  { href: "/dashboard/settings", label: "Settings", icon: Settings2, exact: false },
   { href: "/dashboard/portfolio", label: "Portfolio", icon: Layers, exact: false },
 ]
 

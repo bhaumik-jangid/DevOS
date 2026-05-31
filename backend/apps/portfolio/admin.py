@@ -39,3 +39,17 @@ class CertificationAdmin(admin.ModelAdmin):
 class BlogPostAdmin(admin.ModelAdmin):
     list_display = ["title", "is_published", "published_at"]
     prepopulated_fields = {"slug": ["title"]}
+from .models import ContactSubmission
+
+@admin.register(ContactSubmission)
+class ContactSubmissionAdmin(admin.ModelAdmin):
+    list_display = ["name", "email", "phone", "telegram_sent", "is_read", "submitted_at"]
+    list_filter = ["telegram_sent", "is_read"]
+    readonly_fields = ["ip_address", "user_agent", "referrer", "submitted_at"]
+    list_editable = ["is_read"]
+from .models import SiteConfig
+
+@admin.register(SiteConfig)
+class SiteConfigAdmin(admin.ModelAdmin):
+    list_display = ["key", "value"]
+    search_fields = ["key"]

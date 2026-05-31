@@ -172,3 +172,27 @@ class SiteConfig(models.Model):
 
     def __str__(self):
         return self.key
+
+
+class ContactSubmission(models.Model):
+    # User-entered fields
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    phone = models.CharField(max_length=20, blank=True)
+    message = models.TextField()
+
+    # Auto-captured metadata
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.CharField(max_length=500, blank=True)
+    referrer = models.CharField(max_length=500, blank=True)
+    submitted_at = models.DateTimeField(auto_now_add=True)
+
+    # Status tracking
+    telegram_sent = models.BooleanField(default=False)
+    is_read = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["-submitted_at"]
+
+    def __str__(self):
+        return f"{self.name} — {self.email} — {self.submitted_at:%Y-%m-%d}"

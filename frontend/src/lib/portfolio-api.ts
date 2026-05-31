@@ -32,3 +32,4 @@ export const getExperience = () => fetcher<Experience[]>("/portfolio/experience/
 export const getCertifications = () => fetcher<Certification[]>("/portfolio/certifications/")
 export const getBlogPosts = () => fetcher<BlogPost[]>("/portfolio/blog/")
 export const getBlogPost = (slug: string) => fetcher<BlogPost>(`/portfolio/blog/${slug}/`)
+export const getSiteConfig = () => fetcher<Record<string, string>>("/portfolio/config/")
