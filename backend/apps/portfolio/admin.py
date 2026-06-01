@@ -3,6 +3,8 @@ from .models import (
     Profile, Academic, Achievement, Skill,
     Experience, Certification, BlogPost
 )
+from .models import SiteConfig
+from .models import ContactSubmission
 
 
 @admin.register(Profile)
@@ -39,7 +41,7 @@ class CertificationAdmin(admin.ModelAdmin):
 class BlogPostAdmin(admin.ModelAdmin):
     list_display = ["title", "is_published", "published_at"]
     prepopulated_fields = {"slug": ["title"]}
-from .models import ContactSubmission
+
 
 @admin.register(ContactSubmission)
 class ContactSubmissionAdmin(admin.ModelAdmin):
@@ -47,7 +49,7 @@ class ContactSubmissionAdmin(admin.ModelAdmin):
     list_filter = ["telegram_sent", "is_read"]
     readonly_fields = ["ip_address", "user_agent", "referrer", "submitted_at"]
     list_editable = ["is_read"]
-from .models import SiteConfig
+
 
 @admin.register(SiteConfig)
 class SiteConfigAdmin(admin.ModelAdmin):

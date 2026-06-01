@@ -25,6 +25,12 @@ export function VideoBubble({ videoUrl }: VideoBubbleProps) {
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
 
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    }
+  }, [])
+
   if (!videoUrl) return null
 
   const handleClick = () => {
@@ -36,11 +42,7 @@ export function VideoBubble({ videoUrl }: VideoBubbleProps) {
     timeoutRef.current = setTimeout(() => setShowTooltip(false), 3500)
   }
 
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current)
-    }
-  }, [])
+
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2">

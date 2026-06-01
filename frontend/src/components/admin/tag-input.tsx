@@ -33,7 +33,7 @@ export function TagInput({ tags, onChange, placeholder = "Type and press Enter" 
   }
 
   return (
-    <div className="min-h-[42px] w-full bg-[#1a1a1c] border border-zinc-800 rounded-lg
+    <div className="min-h-10.5 w-full bg-[#1a1a1c] border border-zinc-800 rounded-lg
                     px-3 py-2 flex flex-wrap gap-1.5 items-center
                     focus-within:border-amber-500/60 focus-within:ring-1
                     focus-within:ring-amber-500/20 transition-colors">

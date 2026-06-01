@@ -9,10 +9,10 @@ import {
 import { Topbar } from "@/components/admin/topbar"
 import { api } from "@/lib/api"
 import type { DeploymentRow } from "@/types/admin"
+import type { LucideIcon } from "lucide-react"
 
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const statusConfig: Record<string, { color: string; icon: any; label: string }> = {
+const statusConfig: Record<string, { color: string; icon: LucideIcon; label: string }> = {
   success: {
     color: "text-emerald-400 bg-emerald-400/10",
     icon: CheckCircle,

@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { GitBranch, ExternalLink, Mail, ArrowUp, Terminal, Bird } from "lucide-react"
+import { GitBranch, ExternalLink, Mail, Terminal, Bird } from "lucide-react"
 import { BackToTop } from "@/components/public/back-to-top";
 
 interface FooterProps {

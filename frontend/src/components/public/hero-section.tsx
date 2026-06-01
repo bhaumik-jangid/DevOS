@@ -19,7 +19,7 @@ const container = {
 
 const item = {
   hidden: { opacity: 0, y: 18 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.25, 0.1, 0.25, 1] } }
+  visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.25, 0.1, 0.25, 1] as const } }
 }
 
 export function HeroSection({ profile, config }: HeroSectionProps) {
@@ -133,7 +133,7 @@ export function HeroSection({ profile, config }: HeroSectionProps) {
                 className="inline-flex items-center gap-2 bg-amber-500
                            hover:bg-amber-400 text-black text-sm font-semibold
                            px-5 py-2.5 rounded-lg transition-colors duration-150
-                           min-h-[44px]">
+                           min-h-11">
                 Hire me
                 <ArrowRight className="w-4 h-4" />
               </Link>
@@ -142,7 +142,7 @@ export function HeroSection({ profile, config }: HeroSectionProps) {
                 className="inline-flex items-center gap-2 border border-zinc-700
                            hover:border-zinc-500 text-zinc-300 hover:text-white
                            text-sm px-5 py-2.5 rounded-lg transition-colors
-                           min-h-[44px]">
+                           min-h-11">
                 View projects
               </Link>
 
@@ -151,7 +151,7 @@ export function HeroSection({ profile, config }: HeroSectionProps) {
                   target="_blank" rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 text-zinc-500
                              hover:text-white text-sm transition-colors
-                             min-h-[44px] px-2">
+                             min-h-11 px-2">
                   <Download className="w-4 h-4" />
                   Resume
                 </a>

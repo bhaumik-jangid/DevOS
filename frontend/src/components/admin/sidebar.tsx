@@ -7,7 +7,8 @@ import {
   Terminal, LayoutDashboard, FolderKanban,
   Activity, Layers, LogOut, ChevronRight,
   Bell, Rocket, Menu, X,
-  BarChart2
+  BarChart2,
+  Settings2
 } from "lucide-react"
 import { useAuthStore } from "@/lib/auth-store"
 import { useRouter } from "next/navigation"
