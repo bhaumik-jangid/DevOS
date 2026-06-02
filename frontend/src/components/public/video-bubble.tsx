@@ -16,10 +16,11 @@ const TOOLTIP_MESSAGES = [
 ]
 
 interface VideoBubbleProps {
-  videoUrl?: string
+  videoUrl?: string,
+  tooltips?: string[],
 }
 
-export function VideoBubble({ videoUrl }: VideoBubbleProps) {
+export function VideoBubble({ videoUrl, tooltips }: VideoBubbleProps) {
   const [tooltip, setTooltip] = useState("")
   const [showTooltip, setShowTooltip] = useState(false)
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -34,8 +35,11 @@ export function VideoBubble({ videoUrl }: VideoBubbleProps) {
   if (!videoUrl) return null
 
   const handleClick = () => {
-    const msg = TOOLTIP_MESSAGES[Math.floor(Math.random() * TOOLTIP_MESSAGES.length)]
-    setTooltip(msg)
+    if(typeof tooltips === "undefined" || tooltips.length === 0) {
+      setTooltip(TOOLTIP_MESSAGES[Math.floor(Math.random() * TOOLTIP_MESSAGES.length)])
+    } else {
+      setTooltip(tooltips[Math.floor(Math.random() * tooltips.length)])
+    }
     setShowTooltip(true)
 
     if (timeoutRef.current) clearTimeout(timeoutRef.current)
