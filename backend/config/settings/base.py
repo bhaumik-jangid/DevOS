@@ -1,5 +1,6 @@
 from pathlib import Path
 from decouple import config
+import cloudinary
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
@@ -26,6 +27,8 @@ INSTALLED_APPS = [
     "apps.alerts",
 
     "rest_framework_simplejwt.token_blacklist",
+    "cloudinary",
+    "cloudinary_storage",
 ]
 
 MIDDLEWARE = [
@@ -135,3 +138,22 @@ CACHES = {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
     }
 }
+
+USE_CLOUDINARY = config("USE_CLOUDINARY", default=False, cast=bool)
+
+if USE_CLOUDINARY:
+    cloudinary.config(
+        cloud_name=config("CLOUDINARY_CLOUD_NAME"),
+        api_key=config("CLOUDINARY_API_KEY"),
+        api_secret=config("CLOUDINARY_API_SECRET"),
+        secure=True,
+    )
+
+    STORAGES = {
+        "default": {
+            "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }

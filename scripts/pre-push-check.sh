@@ -4,6 +4,15 @@ set -e
 echo "=== DevOS Pre-push Check ==="
 
 echo ""
+echo "--- Cleaning test database ---"
+docker compose exec -T db psql -U devos_user -d devos -c \
+  "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'devos_test' AND pid <> pg_backend_pid();" \
+  > /dev/null 2>&1 || true
+docker compose exec -T db psql -U devos_user -d devos -c \
+  "DROP DATABASE IF EXISTS devos_test;" \
+  > /dev/null 2>&1 || true
+
+echo ""
 echo "--- Backend tests ---"
 docker compose exec -T backend pytest apps/ -v --tb=short -q
 if [ $? -ne 0 ]; then

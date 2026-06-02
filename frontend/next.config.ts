@@ -2,7 +2,6 @@ import type { NextConfig } from "next"
 
 const nextConfig: NextConfig = {
   images: {
-    dangerouslyAllowSVG: true,
     remotePatterns: [
       {
         protocol: "http",
@@ -19,12 +18,12 @@ const nextConfig: NextConfig = {
         hostname: "*.onrender.com",
         pathname: "/media/**",
       },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+        pathname: "/**",
+      },
     ],
-  },
-  experimental: {
-    serverActions: {
-      allowedOrigins: ["localhost:8090"],
-    },
   },
 }
 

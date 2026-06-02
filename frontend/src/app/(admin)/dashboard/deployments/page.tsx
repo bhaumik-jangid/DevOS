@@ -11,6 +11,15 @@ import { api } from "@/lib/api"
 import type { DeploymentRow } from "@/types/admin"
 import type { LucideIcon } from "lucide-react"
 
+interface FailedDeployment {
+  id: number
+  project_name: string
+  commit_hash?: string
+  branch: string
+  started_at: string
+  error_message?: string
+}
+
 
 const statusConfig: Record<string, { color: string; icon: LucideIcon; label: string }> = {
   success: {
@@ -206,7 +215,7 @@ const [deployments, setDeployments] = useState<DeploymentRow[]>([])
               </div>
             </div>
             <div className="divide-y divide-zinc-800/40">
-              {stats.recent_failed.map((dep: any) => (
+              {stats.recent_failed.map((dep: FailedDeployment) => (
                 <div key={dep.id} className="px-4 sm:px-5 py-3.5">
                   <div className="flex items-start justify-between gap-3">
                     <div>
