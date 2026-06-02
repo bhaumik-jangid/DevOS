@@ -89,6 +89,7 @@ services:
     command: >
       sh -c "while true; do
         python manage.py run_health_checks;
+        python manage.py check_ssl;
         sleep 300;
       done"
     env_file:

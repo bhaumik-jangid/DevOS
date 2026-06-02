@@ -3,6 +3,9 @@ import requests
 from django.utils import timezone
 from apps.projects.models import Project
 from .models import HealthCheck, Incident
+import ssl
+import socket
+from datetime import datetime
 
 TIMEOUT_SECONDS = 10
 
@@ -98,5 +101,77 @@ def run_all_checks() -> dict:
                 results["healthy"] += 1
             else:
                 results["unhealthy"] += 1
+
+    return results
+
+def check_ssl_expiry(hostname: str, port: int = 443) -> dict:
+    """Check SSL certificate expiry for a hostname."""
+    try:
+        context = ssl.create_default_context()
+        with socket.create_connection((hostname, port), timeout=10) as sock:
+            with context.wrap_socket(sock, server_hostname=hostname) as ssock:
+                cert = ssock.getpeercert()
+                expiry_str = cert["notAfter"]
+                expiry_date = datetime.strptime(
+                    expiry_str, "%b %d %H:%M:%S %Y %Z"
+                ).replace(tzinfo=timezone.utc)
+
+                now = timezone.now()
+                days_remaining = (expiry_date - now).days
+                return {
+                    "hostname": hostname,
+                    "expiry_date": expiry_date.isoformat(),
+                    "days_remaining": days_remaining,
+                    "is_valid": days_remaining > 0,
+                    "is_expiring_soon": days_remaining <= 30,
+                }
+    except Exception as e:
+        return {
+            "hostname": hostname,
+            "expiry_date": None,
+            "days_remaining": None,
+            "is_valid": False,
+            "is_expiring_soon": False,
+            "error": str(e)[:200],
+        }
+
+
+def check_all_ssl() -> list:
+    """Check SSL for all projects with live URLs."""
+    from apps.projects.models import Project
+    from apps.alerts.services import send_alert
+
+    results = []
+    projects = Project.objects.filter(
+        is_public=True
+    ).exclude(live_url="")
+
+    for project in projects:
+        try:
+            from urllib.parse import urlparse
+            parsed = urlparse(project.live_url)
+            if parsed.scheme != "https":
+                continue
+            hostname = parsed.netloc.split(":")[0]
+            result = check_ssl_expiry(hostname)
+            result["project_id"] = project.id
+            result["project_name"] = project.name
+
+            if result["is_expiring_soon"] and result["days_remaining"] is not None:
+                send_alert(
+                    subject=f"SSL expiring: {project.name}",
+                    message=(
+                        f"⚠️ <b>SSL certificate expiring soon</b>\n\n"
+                        f"Project: <b>{project.name}</b>\n"
+                        f"Domain: {hostname}\n"
+                        f"Days remaining: {result['days_remaining']}\n"
+                        f"Expiry: {result['expiry_date']}"
+                    ),
+                    alert_type="custom",
+                    project=project,
+                )
+            results.append(result)
+        except Exception:
+            pass
 
     return results

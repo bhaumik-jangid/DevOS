@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react"
 import { toast } from "sonner"
 import {
-  RefreshCw, CheckCircle, XCircle,
+  RefreshCw, CheckCircle, XCircle, Shield,
   AlertTriangle, Clock, Wifi
 } from "lucide-react"
 import { Topbar } from "@/components/admin/topbar"
@@ -227,6 +227,7 @@ export default function MonitoringPage() {
 
         {/* Open incidents */}
         <OpenIncidents />
+        <SSLPanel />
       </main>
     </>
   )
@@ -272,6 +273,62 @@ function OpenIncidents() {
                   {new Date(incident.started_at).toLocaleString()}
                 </p>
               </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function SSLPanel() {
+  const [sslData, setSslData] = useState<any[]>([])
+
+  useEffect(() => {
+    api.get("/monitoring/ssl/").then((res) => {
+      setSslData(res.data)
+    }).catch(() => {})
+  }, [])
+
+  if (!sslData.length) return null
+
+  const expiring = sslData.filter((s) => s.is_expiring_soon)
+
+  return (
+    <div className={`border rounded-xl overflow-hidden ${
+      expiring.length > 0 ? "border-amber-500/20" : "border-zinc-800/60"
+    }`}>
+      <div className={`px-5 py-3.5 border-b flex items-center gap-2 ${
+        expiring.length > 0
+          ? "border-amber-500/20 bg-amber-500/5"
+          : "border-zinc-800/60"
+      }`}>
+        <Shield className="w-3.5 h-3.5 text-amber-500" />
+        <p className="text-sm font-medium text-white">SSL certificates</p>
+        {expiring.length > 0 && (
+          <span className="ml-auto text-xs text-amber-400 font-mono">
+            {expiring.length} expiring soon
+          </span>
+        )}
+      </div>
+      <div className="divide-y divide-zinc-800/40">
+        {sslData.map((ssl, i) => (
+          <div key={i} className="px-5 py-3 flex items-center justify-between">
+            <p className="text-sm text-white">{ssl.project_name}</p>
+            <div className="flex items-center gap-3">
+              {ssl.days_remaining !== null ? (
+                <span className={`text-xs font-mono ${
+                  ssl.days_remaining <= 7 ? "text-red-400" :
+                  ssl.days_remaining <= 30 ? "text-amber-400" :
+                  "text-emerald-400"
+                }`}>
+                  {ssl.days_remaining}d remaining
+                </span>
+              ) : (
+                <span className="text-xs text-zinc-600 font-mono">
+                  {ssl.error || "N/A"}
+                </span>
+              )}
             </div>
           </div>
         ))}

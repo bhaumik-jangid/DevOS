@@ -157,3 +157,4 @@ if USE_CLOUDINARY:
             "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
         },
     }
+WEBHOOK_SECRET = config("WEBHOOK_SECRET", default="")

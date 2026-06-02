@@ -81,3 +81,13 @@ class IncidentListView(generics.ListAPIView):
         if self.request.query_params.get("open"):
             qs = qs.filter(is_resolved=False)
         return qs
+
+
+class SSLStatusView(APIView):
+    """Returns SSL status for all projects with HTTPS URLs."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        from .services import check_all_ssl
+        results = check_all_ssl()
+        return Response(results)

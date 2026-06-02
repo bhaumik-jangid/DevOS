@@ -13,3 +13,10 @@ urlpatterns = [
     path("history/<int:project_id>/", HealthCheckHistoryView.as_view()),
     path("incidents/", IncidentListView.as_view()),
 ]
+
+from django.urls import path as dj_path
+from .views import SSLStatusView
+
+urlpatterns += [
+    dj_path("ssl/", SSLStatusView.as_view()),
+]

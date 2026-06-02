@@ -102,3 +102,56 @@ class DeploymentStatsView(APIView):
             "by_status": {item["status"]: item["count"] for item in by_status},
             "recent_failed": DeploymentSerializer(recent_failed, many=True).data,
         })
+
+
+class DeploymentWebhookView(APIView):
+    """
+    Receives deployment notifications from Render and Vercel.
+    No auth — secured by secret token in URL.
+    """
+    permission_classes = []
+
+    def post(self, request, source: str, token: str):
+        from django.conf import settings
+        expected = getattr(settings, "WEBHOOK_SECRET", "")
+        if expected and token != expected:
+            return Response({"detail": "Invalid token"}, status=401)
+
+        data = request.data
+        project_slug = data.get("project") or data.get("name", "")
+        status_map = {
+            "live": "success",
+            "succeeded": "success",
+            "failed": "failed",
+            "canceled": "cancelled",
+            "building": "in_progress",
+        }
+
+        deploy_status = status_map.get(
+            str(data.get("status", "")).lower(), "success"
+        )
+
+        from apps.projects.models import Project
+        project = None
+        if project_slug:
+            project = Project.objects.filter(
+                slug=project_slug
+            ).first() or Project.objects.filter(
+                name__icontains=project_slug
+            ).first()
+
+        if project:
+            from django.utils import timezone
+            Deployment.objects.create(
+                project=project,
+                status=deploy_status,
+                source=source if source in ["render", "vercel"] else "webhook",
+                branch=data.get("branch", "main"),
+                commit_hash=data.get("commitId", data.get("commit", ""))[:40],
+                commit_message=data.get("commitMessage", data.get("message", ""))[:500],
+                triggered_by="webhook",
+                deployment_url=data.get("url", data.get("deploymentUrl", "")),
+                finished_at=timezone.now(),
+            )
+
+        return Response({"received": True})

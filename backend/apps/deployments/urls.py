@@ -12,3 +12,9 @@ urlpatterns = [
     path("<int:pk>/", DeploymentDetailView.as_view()),
     path("<int:pk>/finish/", FinishDeploymentView.as_view()),
 ]
+
+from .views import DeploymentWebhookView
+
+urlpatterns += [
+    path("webhook/<str:source>/<str:token>/", DeploymentWebhookView.as_view()),
+]
