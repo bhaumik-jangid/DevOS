@@ -1,6 +1,10 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from "axios"
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8090/api/v1"
+const BASE_URL = (
+  typeof window === "undefined"
+    ? process.env.INTERNAL_API_URL
+    : process.env.NEXT_PUBLIC_API_URL
+) || "/api/v1"
 
 export const api = axios.create({
   baseURL: BASE_URL,

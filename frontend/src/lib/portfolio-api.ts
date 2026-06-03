@@ -3,9 +3,11 @@ import {
   BlogPost, Profile, Academic, Achievement
 } from "@/types/portfolio"
 
+// Server-side: use internal URL to bypass proxy for performance
+// Client-side: use NEXT_PUBLIC_API_URL (relative /api/v1 in production)
 const API = typeof window === "undefined"
   ? process.env.INTERNAL_API_URL || "http://backend:8000/api/v1"
-  : process.env.NEXT_PUBLIC_API_URL || "http://localhost:8090/api/v1"
+  : process.env.NEXT_PUBLIC_API_URL || "/api/v1"
 
 async function fetcher<T>(path: string): Promise<T> {
   try {
