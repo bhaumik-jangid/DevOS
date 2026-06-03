@@ -103,6 +103,10 @@ export interface BlogPost {
   excerpt: string
   cover_image: string | null
   tags: string[]
+  category: string
   published_at: string
+  reading_time_minutes: number
+  view_count: number
+  featured: boolean
   content?: string
 }

@@ -5,6 +5,8 @@ from .views import (
     HealthCheckHistoryView,
     IncidentListView,
 )
+from django.urls import path as dj_path
+from .views import SSLStatusView
 
 urlpatterns = [
     path("status/", ProjectStatusView.as_view()),
@@ -14,8 +16,6 @@ urlpatterns = [
     path("incidents/", IncidentListView.as_view()),
 ]
 
-from django.urls import path as dj_path
-from .views import SSLStatusView
 
 urlpatterns += [
     dj_path("ssl/", SSLStatusView.as_view()),

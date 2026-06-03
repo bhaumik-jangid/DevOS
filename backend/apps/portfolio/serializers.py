@@ -48,15 +48,20 @@ class CertificationSerializer(serializers.ModelSerializer):
 
 
 class BlogPostSerializer(serializers.ModelSerializer):
+    reading_time_minutes = serializers.IntegerField(read_only=True)
+
     class Meta:
         model = BlogPost
         fields = [
-            "id", "title", "slug", "excerpt",
-            "cover_image", "tags", "published_at"
+            "id", "title", "slug", "excerpt", "cover_image",
+            "tags", "category", "published_at", "reading_time_minutes",
+            "view_count", "featured"
         ]
 
 
 class BlogPostDetailSerializer(serializers.ModelSerializer):
+    reading_time_minutes = serializers.IntegerField(read_only=True)
+
     class Meta:
         model = BlogPost
         fields = "__all__"

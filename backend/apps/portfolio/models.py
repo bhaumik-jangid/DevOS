@@ -151,8 +151,11 @@ class BlogPost(models.Model):
     content = models.TextField()
     cover_image = models.ImageField(upload_to="blog/", null=True, blank=True)
     tags = models.JSONField(default=list)
+    category = models.CharField(max_length=100, blank=True)
     is_published = models.BooleanField(default=False)
     published_at = models.DateTimeField(null=True, blank=True)
+    view_count = models.IntegerField(default=0)
+    featured = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -161,6 +164,11 @@ class BlogPost(models.Model):
 
     def __str__(self):
         return self.title
+
+    @property
+    def reading_time_minutes(self) -> int:
+        word_count = len(self.content.split())
+        return max(1, round(word_count / 200))
 
 
 class SiteConfig(models.Model):
@@ -180,6 +188,7 @@ class ContactSubmission(models.Model):
     email = models.EmailField()
     phone = models.CharField(max_length=20, blank=True)
     message = models.TextField()
+    page = models.CharField(max_length=200, blank=True)
 
     # Auto-captured metadata
     ip_address = models.GenericIPAddressField(null=True, blank=True)

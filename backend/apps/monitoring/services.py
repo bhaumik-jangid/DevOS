@@ -104,6 +104,7 @@ def run_all_checks() -> dict:
 
     return results
 
+
 def check_ssl_expiry(hostname: str, port: int = 443) -> dict:
     """Check SSL certificate expiry for a hostname."""
     try:

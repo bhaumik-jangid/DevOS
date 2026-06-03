@@ -282,6 +282,7 @@ function OpenIncidents() {
 }
 
 function SSLPanel() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [sslData, setSslData] = useState<any[]>([])
 
   useEffect(() => {

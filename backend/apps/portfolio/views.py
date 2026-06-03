@@ -1,10 +1,10 @@
 import logging
-from rest_framework import generics, status
-from rest_framework.permissions import AllowAny
-from rest_framework.response import Response
-from rest_framework.views import APIView
 from django.utils.decorators import method_decorator
 from django_ratelimit.decorators import ratelimit
+from rest_framework import generics, status
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from .models import (
     Profile, Academic, Achievement, Skill,
@@ -62,7 +62,19 @@ class CertificationListView(generics.ListAPIView):
 class BlogPostListView(generics.ListAPIView):
     permission_classes = [AllowAny]
     serializer_class = BlogPostSerializer
-    queryset = BlogPost.objects.filter(is_published=True)
+
+    def get_queryset(self):
+        qs = BlogPost.objects.filter(is_published=True)
+        tag = self.request.query_params.get("tag")
+        category = self.request.query_params.get("category")
+        featured = self.request.query_params.get("featured")
+        if tag:
+            qs = qs.filter(tags__contains=[tag])
+        if category:
+            qs = qs.filter(category__iexact=category)
+        if featured:
+            qs = qs.filter(featured=True)
+        return qs
 
 
 class BlogPostDetailView(generics.RetrieveAPIView):
@@ -70,6 +82,35 @@ class BlogPostDetailView(generics.RetrieveAPIView):
     serializer_class = BlogPostDetailSerializer
     queryset = BlogPost.objects.filter(is_published=True)
     lookup_field = "slug"
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        BlogPost.objects.filter(pk=instance.pk).update(
+            view_count=instance.view_count + 1
+        )
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+
+class BlogPostAdminView(generics.ListCreateAPIView):
+    """Admin — list all posts including drafts, create new posts."""
+    permission_classes = [IsAuthenticated]
+    serializer_class = BlogPostDetailSerializer
+    queryset = BlogPost.objects.all()
+
+
+class BlogPostAdminDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """Admin — retrieve, update, delete individual post by ID."""
+    permission_classes = [IsAuthenticated]
+    serializer_class = BlogPostDetailSerializer
+
+    def get_queryset(self):
+        return BlogPost.objects.all()
+
+    def get_object(self):
+        queryset = self.get_queryset()
+        pk = self.kwargs.get("pk")
+        return generics.get_object_or_404(queryset, pk=pk)
 
 
 class ContactFormView(APIView):
@@ -81,6 +122,8 @@ class ContactFormView(APIView):
         email = request.data.get("email", "").strip()
         message = request.data.get("message", "").strip()
         phone = request.data.get("phone", "").strip()
+        page = request.data.get("page", "/").strip()
+        referrer = request.data.get("referrer", "").strip()
 
         errors = {}
         if not name:
@@ -94,15 +137,12 @@ class ContactFormView(APIView):
         if errors:
             return Response(errors, status=status.HTTP_400_BAD_REQUEST)
 
-        # Capture metadata
         ip = (
             request.META.get("HTTP_X_FORWARDED_FOR", "").split(",")[0].strip()
             or request.META.get("REMOTE_ADDR", "")
         )
         user_agent = request.META.get("HTTP_USER_AGENT", "")[:500]
-        referrer = request.META.get("HTTP_REFERER", "")[:500]
 
-        # Save to database
         submission = ContactSubmission.objects.create(
             name=name,
             email=email,
@@ -110,10 +150,10 @@ class ContactFormView(APIView):
             message=message,
             ip_address=ip or None,
             user_agent=user_agent,
-            referrer=referrer,
+            referrer=referrer[:500],
+            page=page[:200],
         )
 
-        # Send Telegram alert
         from apps.alerts.services import alert_contact_form
         alert = alert_contact_form(
             name=name,
@@ -125,10 +165,34 @@ class ContactFormView(APIView):
         submission.telegram_sent = alert.status == "sent"
         submission.save(update_fields=["telegram_sent"])
 
-        if not submission.telegram_sent:
-            logger.error(f"Telegram alert failed for contact submission {submission.id}")
+        if alert.status == "failed":
+            logger.error("Contact form Telegram alert failed for %s", email)
 
         return Response(
             {"detail": "Message sent. I will get back to you soon."},
             status=status.HTTP_200_OK
         )
+
+
+class ContactSubmissionListView(APIView):
+    """Admin only — view all contact submissions."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        submissions = ContactSubmission.objects.all()
+        data = [
+            {
+                "id": s.id,
+                "name": s.name,
+                "email": s.email,
+                "phone": s.phone,
+                "message": s.message,
+                "page": s.page,
+                "ip_address": str(s.ip_address) if s.ip_address else None,
+                "submitted_at": s.submitted_at.isoformat(),
+                "is_read": s.is_read,
+                "telegram_sent": s.telegram_sent,
+            }
+            for s in submissions
+        ]
+        return Response(data)

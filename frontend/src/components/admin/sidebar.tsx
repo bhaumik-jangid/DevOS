@@ -8,7 +8,8 @@ import {
   Activity, Layers, LogOut, ChevronRight,
   Bell, Rocket, Menu, X,
   BarChart2,
-  Settings2
+  Settings2,
+  BookOpen
 } from "lucide-react"
 import { useAuthStore } from "@/lib/auth-store"
 import { useRouter } from "next/navigation"
@@ -22,6 +23,7 @@ const navItems = [
   { href: "/dashboard/monitoring/alerts", label: "Alerts", icon: Bell, exact: false },
   { href: "/dashboard/analytics", label: "Analytics", icon: BarChart2, exact: false },
   { href: "/dashboard/settings", label: "Settings", icon: Settings2, exact: false },
+  { href: "/dashboard/blog", label: "Blog", icon: BookOpen, exact: false },
   { href: "/dashboard/portfolio", label: "Portfolio", icon: Layers, exact: false },
 ]
 

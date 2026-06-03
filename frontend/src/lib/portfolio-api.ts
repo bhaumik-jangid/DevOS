@@ -30,6 +30,13 @@ export const getProject = (slug: string) => fetcher<Project>(`/projects/${slug}/
 export const getSkills = () => fetcher<Skill[]>("/portfolio/skills/")
 export const getExperience = () => fetcher<Experience[]>("/portfolio/experience/")
 export const getCertifications = () => fetcher<Certification[]>("/portfolio/certifications/")
-export const getBlogPosts = () => fetcher<BlogPost[]>("/portfolio/blog/")
+export const getBlogPosts = (params?: { tag?: string; category?: string; featured?: boolean }) => {
+  const query = new URLSearchParams()
+  if (params?.tag) query.set("tag", params.tag)
+  if (params?.category) query.set("category", params.category)
+  if (params?.featured) query.set("featured", "true")
+  const qs = query.toString()
+  return fetcher<BlogPost[]>(`/portfolio/blog/${qs ? "?" + qs : ""}`)
+}
 export const getBlogPost = (slug: string) => fetcher<BlogPost>(`/portfolio/blog/${slug}/`)
 export const getSiteConfig = () => fetcher<Record<string, string>>("/portfolio/config/")

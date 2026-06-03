@@ -5,6 +5,7 @@ from .views import (
     FinishDeploymentView,
     DeploymentStatsView,
 )
+from .views import DeploymentWebhookView
 
 urlpatterns = [
     path("", DeploymentListView.as_view()),
@@ -13,7 +14,6 @@ urlpatterns = [
     path("<int:pk>/finish/", FinishDeploymentView.as_view()),
 ]
 
-from .views import DeploymentWebhookView
 
 urlpatterns += [
     path("webhook/<str:source>/<str:token>/", DeploymentWebhookView.as_view()),
