@@ -23,7 +23,7 @@ export async function DSASection({ profile }: { profile: Profile | null }) {
       </p>
       <h2 className="text-2xl font-medium text-white mb-8">
         DSA & competitive programming
-      </h2>
+      </h2>a
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
@@ -79,7 +79,7 @@ export async function DSASection({ profile }: { profile: Profile | null }) {
         )}
 
         {/* Total stats */}
-        <div className="border border-zinc-800/60 rounded-xl p-5 bg-zinc-900/20">
+        {/* <div className="border border-zinc-800/60 rounded-xl p-5 bg-zinc-900/20">
           <div className="flex items-center gap-2.5 mb-4">
             <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20
                             flex items-center justify-center">
@@ -125,7 +125,7 @@ export async function DSASection({ profile }: { profile: Profile | null }) {
               </div>
             )}
           </div>
-        </div>
+        </div> */}
       </div>
     </AnimatedSection>
   )
