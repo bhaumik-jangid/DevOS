@@ -4,7 +4,7 @@ import cloudinary
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-SECRET_KEY = config("SECRET_KEY")
+SECRET_KEY = config("SECRET_KEY", default="build-time-placeholder-not-for-production")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -66,10 +66,10 @@ WSGI_APPLICATION = "config.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": config("DB_NAME"),
-        "USER": config("DB_USER"),
-        "PASSWORD": config("DB_PASSWORD"),
-        "HOST": config("DB_HOST"),
+        "NAME": config("DB_NAME", default="devos"),
+        "USER": config("DB_USER", default="devos_user"),
+        "PASSWORD": config("DB_PASSWORD", default=""),
+        "HOST": config("DB_HOST", default="localhost"),
         "PORT": config("DB_PORT", default="5432"),
     }
 }
@@ -143,9 +143,9 @@ USE_CLOUDINARY = config("USE_CLOUDINARY", default=False, cast=bool)
 
 if USE_CLOUDINARY:
     cloudinary.config(
-        cloud_name=config("CLOUDINARY_CLOUD_NAME"),
-        api_key=config("CLOUDINARY_API_KEY"),
-        api_secret=config("CLOUDINARY_API_SECRET"),
+        cloud_name=config("CLOUDINARY_CLOUD_NAME", default="dutjjtpst"),
+        api_key=config("CLOUDINARY_API_KEY", default="958168721481594"),
+        api_secret=config("CLOUDINARY_API_SECRET", default="hgst_kIdPGz9K_hGd8m7FYqrqHU"),
         secure=True,
     )
 
