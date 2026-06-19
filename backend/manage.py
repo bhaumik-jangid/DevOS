@@ -2,7 +2,10 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
+from django.conf import settings
 
+
+print("DJANGO_SETTINGS_MODULE =", os.environ.get("DJANGO_SETTINGS_MODULE"))
 
 def main():
     """Run administrative tasks."""
@@ -15,6 +18,10 @@ def main():
             "available on your PYTHONPATH environment variable? Did you "
             "forget to activate a virtual environment?"
         ) from exc
+    try:
+        print("DATABASES =", settings.DATABASES)
+    except Exception as e:
+        print("DATABASES ERROR:", e)
     execute_from_command_line(sys.argv)
 
 
