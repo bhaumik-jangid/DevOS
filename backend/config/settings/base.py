@@ -63,14 +63,22 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
+import os as _os
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": config("DB_NAME", default="devos"),
-        "USER": config("DB_USER", default="devos_user"),
-        "PASSWORD": config("DB_PASSWORD", default=""),
-        "HOST": config("DB_HOST", default="localhost"),
-        "PORT": config("DB_PORT", default="5432"),
+        "NAME": _os.environ.get("DB_NAME", "devos"),
+        "USER": _os.environ.get("DB_USER", "devos_user"),
+        "PASSWORD": _os.environ.get("DB_PASSWORD", "devos_password"),
+        "HOST": _os.environ.get("DB_HOST", "localhost"),
+        "PORT": _os.environ.get("DB_PORT", "5432"),
+        "OPTIONS": {
+            "connect_timeout": 10,
+        },
+        "TEST": {
+            "NAME": "devos_test",
+        },
     }
 }
 
