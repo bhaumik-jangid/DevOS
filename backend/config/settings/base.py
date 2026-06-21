@@ -1,10 +1,14 @@
+import os
 from pathlib import Path
 from decouple import config
-import cloudinary
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 SECRET_KEY = config("SECRET_KEY", default="build-time-placeholder-not-for-production")
+
+DEBUG = os.environ.get("DEBUG", "False").lower() in ("true", "1", "yes")
+
+ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -13,11 +17,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # Third-party
     "rest_framework",
     "corsheaders",
     "rest_framework_simplejwt",
-    # Local apps
+    "rest_framework_simplejwt.token_blacklist",
+    "cloudinary",
+    "cloudinary_storage",
     "apps.core",
     "apps.accounts",
     "apps.projects",
@@ -25,10 +30,6 @@ INSTALLED_APPS = [
     "apps.deployments",
     "apps.portfolio",
     "apps.alerts",
-
-    "rest_framework_simplejwt.token_blacklist",
-    "cloudinary",
-    "cloudinary_storage",
 ]
 
 MIDDLEWARE = [
@@ -63,16 +64,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-import os as _os
-
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": _os.environ.get("DB_NAME", "devos"),
-        "USER": _os.environ.get("DB_USER", "devos_user"),
-        "PASSWORD": _os.environ.get("DB_PASSWORD", "devos_password"),
-        "HOST": _os.environ.get("DB_HOST", "localhost"),
-        "PORT": _os.environ.get("DB_PORT", "5432"),
+        "NAME": os.environ.get("DB_NAME", "devos"),
+        "USER": os.environ.get("DB_USER", "devos_user"),
+        "PASSWORD": os.environ.get("DB_PASSWORD", "devos_password"),
+        "HOST": os.environ.get("DB_HOST", "localhost"),
+        "PORT": os.environ.get("DB_PORT", "5432"),
         "OPTIONS": {
             "connect_timeout": 10,
         },
@@ -81,6 +80,8 @@ DATABASES = {
         },
     }
 }
+
+AUTH_USER_MODEL = "accounts.User"
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
@@ -96,24 +97,20 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-AUTH_USER_MODEL = "accounts.User"
 
-# DRF global config
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": (
+    "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
-    ),
-    "DEFAULT_PERMISSION_CLASSES": (
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
-    ),
-    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
-    "PAGE_SIZE": 20,
+    ],
 }
 
-# JWT config
 from datetime import timedelta
 
 SIMPLE_JWT = {
@@ -121,23 +118,10 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
-    "UPDATE_LAST_LOGIN": True,
-    "AUTH_HEADER_TYPES": ("Bearer",),
-    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
 }
 
-TELEGRAM_BOT_TOKEN = config("TELEGRAM_BOT_TOKEN", default="")
-TELEGRAM_CHAT_ID = config("TELEGRAM_CHAT_ID", default="")
+CORS_ALLOW_ALL_ORIGINS = False
 
-MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
-
-# Security
-SECURE_CONTENT_TYPE_NOSNIFF = True
-X_FRAME_OPTIONS = "DENY"
-SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
-
-# Rate limiting
 RATELIMIT_USE_CACHE = "default"
 RATELIMIT_FAIL_OPEN = False
 
@@ -147,16 +131,22 @@ CACHES = {
     }
 }
 
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
+
+TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
+TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "")
+WEBHOOK_SECRET = os.environ.get("WEBHOOK_SECRET", "")
+
 USE_CLOUDINARY = config("USE_CLOUDINARY", default=False, cast=bool)
 
 if USE_CLOUDINARY:
+    import cloudinary
     cloudinary.config(
-        cloud_name=config("CLOUDINARY_CLOUD_NAME", default="dutjjtpst"),
-        api_key=config("CLOUDINARY_API_KEY", default="958168721481594"),
-        api_secret=config("CLOUDINARY_API_SECRET", default="hgst_kIdPGz9K_hGd8m7FYqrqHU"),
+        cloud_name=os.environ.get("CLOUDINARY_CLOUD_NAME", ""),
+        api_key=os.environ.get("CLOUDINARY_API_KEY", ""),
+        api_secret=os.environ.get("CLOUDINARY_API_SECRET", ""),
         secure=True,
     )
-
     STORAGES = {
         "default": {
             "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
@@ -165,4 +155,12 @@ if USE_CLOUDINARY:
             "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
         },
     }
-WEBHOOK_SECRET = config("WEBHOOK_SECRET", default="")
+else:
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }

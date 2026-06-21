@@ -13,5 +13,11 @@ COPY . .
 
 EXPOSE 8000
 
-# CMD ["sh", "-c", "python manage.py migrate --no-input && python manage.py collectstatic --no-input && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120"]
-CMD ["sh", "-c", "python -c 'import os; print(os.environ.get(\"DJANGO_SETTINGS_MODULE\"))' && python manage.py migrate --no-input"]
+CMD ["sh", "-c", "\
+  echo 'DJANGO_SETTINGS_MODULE =' $DJANGO_SETTINGS_MODULE && \
+  echo 'DATABASES CHECK:' && \
+  python -c \"import os; print('DB_HOST:', os.environ.get('DB_HOST', 'NOT SET'))\" && \
+  python manage.py migrate --no-input && \
+  python manage.py collectstatic --no-input && \
+  gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120 \
+"]
