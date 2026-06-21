@@ -1,6 +1,6 @@
 import type { NextConfig } from "next"
 
-const BACKEND_URL = process.env.BACKEND_INTERNAL_URL || "https://your-backend.onrender.com"
+const BACKEND_URL = process.env.BACKEND_INTERNAL_URL || "https://devos-i1p2.onrender.com"
 
 const nextConfig: NextConfig = {
   async rewrites() {
