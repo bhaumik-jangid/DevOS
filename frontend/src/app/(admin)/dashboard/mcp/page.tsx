@@ -33,7 +33,7 @@ export default function MCPPage() {
   const [args, setArgs] = useState<Record<string, string>>({})
   const [result, setResult] = useState<ToolResult | null>(null)
   const [loading, setLoading] = useState(false)
-  const [context, setContext] = useState<unknown>(null)
+  const [context, setContext] = useState<Record<string, unknown> | null>(null)
 
   useEffect(() => {
     api.get("/mcp/tools/").then((res) => {
