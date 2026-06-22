@@ -20,6 +20,7 @@ urlpatterns = [
         path("portfolio/", include("apps.portfolio.urls")),
         path("alerts/", include("apps.alerts.urls")),
         path("core/", include("apps.core.urls")),
+        path("mcp/", include("apps.mcp.urls")),
     ])),
 ]
 

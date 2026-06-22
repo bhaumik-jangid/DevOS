@@ -9,7 +9,8 @@ import {
   Bell, Rocket, Menu, X,
   BarChart2,
   Settings2,
-  BookOpen
+  BookOpen,
+  Cpu
 } from "lucide-react"
 import { useAuthStore } from "@/lib/auth-store"
 import { useRouter } from "next/navigation"
@@ -22,6 +23,7 @@ const navItems = [
   { href: "/dashboard/monitoring", label: "Monitoring", icon: Activity, exact: false },
   { href: "/dashboard/monitoring/alerts", label: "Alerts", icon: Bell, exact: false },
   { href: "/dashboard/analytics", label: "Analytics", icon: BarChart2, exact: false },
+  { href: "/dashboard/mcp", label: "MCP Tools", icon: Cpu, exact: false },
   { href: "/dashboard/settings", label: "Settings", icon: Settings2, exact: false },
   { href: "/dashboard/blog", label: "Blog", icon: BookOpen, exact: false },
   { href: "/dashboard/portfolio", label: "Portfolio", icon: Layers, exact: false },

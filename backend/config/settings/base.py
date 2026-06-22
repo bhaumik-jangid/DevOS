@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     "apps.deployments",
     "apps.portfolio",
     "apps.alerts",
+    "apps.mcp",
 ]
 
 MIDDLEWARE = [
