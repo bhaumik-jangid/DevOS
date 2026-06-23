@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
+from apps.core.health import HealthView
 from django.http import JsonResponse
 from django.conf import settings
 from django.conf.urls.static import static
@@ -10,8 +11,9 @@ def health_check(request):
 
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
-    path("api/health/", health_check, name="health-check"),
+    path("devos-control/", admin.site.urls),
+    path("api/health/", HealthView.as_view(), name="health"),
+    # old: health_check, name="health-check"),
     path("api/v1/", include([
         path("auth/", include("apps.accounts.urls")),
         path("projects/", include("apps.projects.urls")),

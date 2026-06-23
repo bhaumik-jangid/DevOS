@@ -31,3 +31,10 @@ LOGGING = {
         "apps": {"handlers": ["console"], "level": "INFO", "propagate": False},
     },
 }
+
+# Connection pooling — important for Supabase PgBouncer
+DATABASES["default"]["CONN_MAX_AGE"] = 0  # Use 0 with PgBouncer
+DATABASES["default"]["OPTIONS"] = {
+    "connect_timeout": 10,
+    "sslmode": "require",
+}
