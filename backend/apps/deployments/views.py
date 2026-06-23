@@ -7,6 +7,10 @@ from rest_framework.views import APIView
 from apps.alerts.services import send_alert
 from .models import Deployment
 from .serializers import DeploymentSerializer, DeploymentCreateSerializer
+from django.db.models import Count
+from django.conf import settings
+from apps.projects.models import Project
+from django.utils import timezone
 
 
 class DeploymentListView(generics.ListCreateAPIView):
@@ -90,7 +94,6 @@ class DeploymentStatsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        from django.db.models import Count
         total = Deployment.objects.count()
         by_status = Deployment.objects.values("status").annotate(count=Count("id"))
         recent_failed = Deployment.objects.filter(
@@ -112,7 +115,6 @@ class DeploymentWebhookView(APIView):
     permission_classes = []
 
     def post(self, request, source: str, token: str):
-        from django.conf import settings
         expected = getattr(settings, "WEBHOOK_SECRET", "")
         if expected and token != expected:
             return Response({"detail": "Invalid token"}, status=401)
@@ -131,7 +133,6 @@ class DeploymentWebhookView(APIView):
             str(data.get("status", "")).lower(), "success"
         )
 
-        from apps.projects.models import Project
         project = None
         if project_slug:
             project = Project.objects.filter(
@@ -141,7 +142,6 @@ class DeploymentWebhookView(APIView):
             ).first()
 
         if project:
-            from django.utils import timezone
             Deployment.objects.create(
                 project=project,
                 status=deploy_status,

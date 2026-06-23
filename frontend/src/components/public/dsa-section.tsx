@@ -1,5 +1,6 @@
 import { Profile } from "@/types/portfolio"
-import { Code2, Trophy, TrendingUp } from "lucide-react"
+// import { Trophy, TrendingUp } from "lucide-react"
+import { Code2 } from "lucide-react"
 import { getLeetCodeStats } from "@/lib/leetcode"
 import { AnimatedSection } from "@/components/ui/animated-section"
 

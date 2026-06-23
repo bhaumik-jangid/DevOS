@@ -166,7 +166,7 @@ def get_open_incidents() -> dict[str, Any]:
         "properties": {
             "status": {
                 "type": "string",
-                "description": "Filter by project status: active, in_progress, maintenance, archived.",
+                "description": "Filter by project status: active,in_progress,maintenance,archived.",
             }
         },
         "required": [],

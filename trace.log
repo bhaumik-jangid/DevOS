@@ -1,0 +1,62 @@
++ set -e
++ echo '=== DevOS Pre-push Check ==='
+=== DevOS Pre-push Check ===
++ echo ''
+
++ echo '--- Cleaning test database ---'
+--- Cleaning test database ---
++ docker compose exec -T db psql -U devos_user -d devos -c 'SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '\''devos_test'\'' AND pid <> pg_backend_pid();'
++ docker compose exec -T db psql -U devos_user -d devos -c 'DROP DATABASE IF EXISTS devos_test;'
++ echo ''
+
++ echo '--- Backend tests ---'
+--- Backend tests ---
++ docker compose exec -T backend pytest apps/ -v --tb=short -q
+time="2026-06-22T15:27:14+05:30" level=warning msg="/home/bhaumik/Desktop/devos/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+============================= test session starts ==============================
+platform linux -- Python 3.11.15, pytest-8.3.3, pluggy-1.6.0 -- /usr/local/bin/python3.11
+cachedir: .pytest_cache
+django: version: 4.2.16, settings: config.settings.development (from env)
+rootdir: /app
+configfile: pytest.ini
+plugins: Faker-40.23.0, django-4.9.0
+collecting ... collected 23 items
+
+apps/accounts/tests/test_auth.py::TestLogin::test_valid_login_returns_tokens PASSED [  4%]
+apps/accounts/tests/test_auth.py::TestLogin::test_invalid_credentials_rejected PASSED [  8%]
+apps/accounts/tests/test_auth.py::TestMe::test_me_returns_user_data PASSED [ 13%]
+apps/accounts/tests/test_auth.py::TestLogout::test_logout_blacklists_token PASSED [ 17%]
+apps/deployments/tests/test_deployments.py::TestDeployments::test_create_deployment PASSED [ 21%]
+apps/deployments/tests/test_deployments.py::TestDeployments::test_stats_endpoint PASSED [ 26%]
+apps/deployments/tests/test_deployments.py::TestDeployments::test_finish_deployment PASSED [ 30%]
+apps/monitoring/tests/test_health_checks.py::TestCheckProject::test_healthy_response_recorded PASSED [ 34%]
+apps/monitoring/tests/test_health_checks.py::TestCheckProject::test_unhealthy_response_recorded PASSED [ 39%]
+apps/monitoring/tests/test_health_checks.py::TestCheckProject::test_timeout_recorded PASSED [ 43%]
+apps/monitoring/tests/test_health_checks.py::TestCheckProject::test_no_endpoint_returns_none PASSED [ 47%]
+apps/monitoring/tests/test_health_checks.py::TestCheckProject::test_incident_opened_on_failure PASSED [ 52%]
+apps/monitoring/tests/test_health_checks.py::TestCheckProject::test_incident_resolved_on_recovery PASSED [ 56%]
+apps/monitoring/tests/test_health_checks.py::TestMonitoringAPI::test_status_returns_project_list PASSED [ 60%]
+apps/portfolio/tests/test_contact.py::TestContactForm::test_valid_submission_accepted PASSED [ 65%]
+apps/portfolio/tests/test_contact.py::TestContactForm::test_missing_name_rejected PASSED [ 69%]
+apps/portfolio/tests/test_contact.py::TestContactForm::test_missing_email_rejected PASSED [ 73%]
+apps/portfolio/tests/test_contact.py::TestContactForm::test_short_message_rejected PASSED [ 78%]
+apps/accounts/tests/test_auth.py::TestLogin::test_missing_fields_rejected PASSED [ 82%]
+apps/accounts/tests/test_auth.py::TestMe::test_me_requires_auth PASSED   [ 86%]
+apps/accounts/tests/test_auth.py::TestLogout::test_logout_requires_auth PASSED [ 91%]
+apps/deployments/tests/test_deployments.py::TestDeployments::test_list_requires_auth PASSED [ 95%]
+apps/monitoring/tests/test_health_checks.py::TestMonitoringAPI::test_status_requires_auth PASSED [100%]
+
+============================== 23 passed in 8.02s ==============================
++ '[' 0 -ne 0 ']'
++ echo ''
+
++ echo '--- Backend lint ---'
+--- Backend lint ---
++ docker compose exec -T backend flake8 apps/ --max-line-length=100 --exclude=migrations -q
+time="2026-06-22T15:27:24+05:30" level=warning msg="/home/bhaumik/Desktop/devos/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+apps/mcp/admin.py
+apps/mcp/devos_tools.py
+apps/mcp/models.py
+apps/mcp/tests.py
+apps/mcp/tools.py
+apps/mcp/views.py

@@ -196,3 +196,45 @@ class ContactSubmissionListView(APIView):
             for s in submissions
         ]
         return Response(data)
+
+class SiteConfigView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        profile = Profile.objects.first()
+        if not profile:
+            return Response({})
+        return Response({
+            "name": profile.name,
+            "tagline": profile.tagline,
+            "github_url": profile.github_url,
+            "linkedin_url": profile.linkedin_url,
+            "twitter_url": profile.twitter_url,
+            "email": profile.email,
+            "phone": profile.phone,
+            "leetcode_username": profile.leetcode_username,
+            "available_for_work": profile.available_for_work,
+            "location": profile.location,
+        })
+
+    def _update_profile(self, request):
+        if not request.user.is_authenticated:
+            return Response({"detail": "Authentication required"}, status=401)
+        profile = Profile.objects.first()
+        if not profile:
+            return Response({"detail": "No profile found"}, status=404)
+        allowed = [
+            "name", "tagline", "bio", "email", "phone",
+            "github_url", "linkedin_url", "available_for_work", "location"
+        ]
+        for field in allowed:
+            if field in request.data:
+                setattr(profile, field, request.data[field])
+        profile.save()
+        return Response(ProfileSerializer(profile).data)
+
+    def patch(self, request):
+        return self._update_profile(request)
+
+    def post(self, request):
+        return self._update_profile(request)

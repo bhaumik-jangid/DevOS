@@ -13,7 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: {
-      default: `${name} — ${tagline}`,
+      default: `${name} - ${tagline}`,
       template: `%s | ${name}`,
     },
     description: bio.slice(0, 160),
@@ -23,13 +23,13 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       type: "website",
       locale: "en_US",
-      title: `${name} — ${tagline}`,
+      title: `${name} - ${tagline}`,
       description: bio.slice(0, 160),
       siteName: name,
     },
     twitter: {
       card: "summary_large_image",
-      title: `${name} — ${tagline}`,
+      title: `${name} - ${tagline}`,
       description: bio.slice(0, 160),
     },
     robots: {
