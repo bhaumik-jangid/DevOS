@@ -36,7 +36,6 @@ class AnalyticsSummaryView(APIView):
         now = timezone.now()
         last_30 = now - timedelta(days=30)
         last_7 = now - timedelta(days=7)
-        print("Pageview : " + str(PageView));
         total_views = PageView.objects.count()
         views_30d = PageView.objects.filter(timestamp__gte=last_30).count()
         views_7d = PageView.objects.filter(timestamp__gte=last_7).count()

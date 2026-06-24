@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import PageView, DailyStat
+from .models import PageView, DailyStat, SiteConfig
 
 
 @admin.register(PageView)
@@ -12,8 +12,6 @@ class PageViewAdmin(admin.ModelAdmin):
 @admin.register(DailyStat)
 class DailyStatAdmin(admin.ModelAdmin):
     list_display = ["date", "page_views", "unique_visitors"]
-
-from .models import SiteConfig
 
 
 @admin.register(SiteConfig)

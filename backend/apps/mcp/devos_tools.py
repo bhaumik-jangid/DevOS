@@ -6,6 +6,15 @@ from __future__ import annotations
 
 from typing import Any
 from .tools import registry
+from apps.watchlist.models import WatchItem
+from django.db.models import Avg
+from apps.projects.models import Project
+from apps.monitoring.models import HealthCheck, Incident
+from apps.deployments.models import Deployment
+from django.utils import timezone
+from datetime import timedelta
+from apps.alerts.models import Alert
+from apps.portfolio.models import ContactSubmission
 
 
 @registry.register(
@@ -26,8 +35,6 @@ from .tools import registry
     },
 )
 def get_project_health(project_slug: str = "") -> dict[str, Any]:
-    from apps.projects.models import Project
-    from apps.monitoring.models import HealthCheck, Incident
 
     qs = Project.objects.filter(is_public=True)
     if project_slug:
@@ -94,7 +101,6 @@ def get_recent_deployments(
     limit: int = 10,
     status: str = "",
 ) -> dict[str, Any]:
-    from apps.deployments.models import Deployment
 
     qs = Deployment.objects.select_related("project").order_by("-started_at")
 
@@ -136,7 +142,6 @@ def get_recent_deployments(
     },
 )
 def get_open_incidents() -> dict[str, Any]:
-    from apps.monitoring.models import Incident
 
     incidents = Incident.objects.filter(
         is_resolved=False
@@ -173,7 +178,6 @@ def get_open_incidents() -> dict[str, Any]:
     },
 )
 def get_project_list(status: str = "") -> dict[str, Any]:
-    from apps.projects.models import Project
 
     qs = Project.objects.all().order_by("name")
     if status:
@@ -215,9 +219,6 @@ def get_project_list(status: str = "") -> dict[str, Any]:
     },
 )
 def get_deployment_stats(days: int = 7) -> dict[str, Any]:
-    from django.utils import timezone
-    from datetime import timedelta
-    from apps.deployments.models import Deployment
 
     since = timezone.now() - timedelta(days=days)
     qs = Deployment.objects.filter(started_at__gte=since)
@@ -269,7 +270,6 @@ def get_deployment_stats(days: int = 7) -> dict[str, Any]:
     },
 )
 def get_alerts(limit: int = 10, status: str = "") -> dict[str, Any]:
-    from apps.alerts.models import Alert
 
     qs = Alert.objects.order_by("-created_at")
     if status:
@@ -315,7 +315,6 @@ def get_contact_submissions(
     limit: int = 10,
     unread_only: bool = False,
 ) -> dict[str, Any]:
-    from apps.portfolio.models import ContactSubmission
 
     qs = ContactSubmission.objects.order_by("-submitted_at")
     if unread_only:
@@ -358,8 +357,6 @@ def get_contact_submissions(
     },
 )
 def get_watchlist_summary(status: str = "") -> dict[str, Any]:
-    from apps.watchlist.models import WatchItem
-    from django.db.models import Avg, Count
 
     qs = WatchItem.objects.all()
     if status:
@@ -402,7 +399,6 @@ def get_watchlist_summary(status: str = "") -> dict[str, Any]:
     },
 )
 def notify_new_seasons() -> dict[str, Any]:
-    from apps.watchlist.models import WatchItem
 
     series = WatchItem.objects.filter(
         media_type__in=["series", "anime"],

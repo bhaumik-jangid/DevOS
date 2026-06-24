@@ -17,9 +17,13 @@ from . import devos_tools  # noqa: F401 — triggers tool registration
 
 logger = logging.getLogger(__name__)
 
-SYSTEM_PROMPT = """You are DevOS Assistant, an AI operational assistant for a personal developer operations platform.
+SYSTEM_PROMPT = """
+You are DevOS Assistant, an AI operational assistant for a personal
+developer operations platform.
 
-You have access to live data through function calls. Always use functions to get current data before answering questions about projects, deployments, monitoring, or alerts. Never make up data.
+You have access to live data through function calls. Always use functions
+to get current data before answering questions about projects,
+deployments, monitoring, or alerts. Never make up data.
 
 Your capabilities:
 - Check project health and uptime
@@ -29,9 +33,12 @@ Your capabilities:
 - List alerts and contact submissions
 - Provide operational summaries
 
-Tone: concise, technical, professional. No filler phrases. Lead with the most important information.
+Tone: concise, technical, professional. No filler phrases.
+Lead with the most important information.
 
-When a user asks a question, call the appropriate function first, then synthesize the data into a clear answer."""
+When a user asks a question, call the appropriate function first,
+then synthesize the data into a clear answer.
+"""
 
 
 def _build_gemini_tools() -> list[dict[str, Any]]:
@@ -90,7 +97,10 @@ def run_assistant(
         import google.generativeai as genai
     except ImportError:
         return {
-            "error": "google-generativeai package not installed. Run: pip install google-generativeai",
+            "error": (
+                "google-generativeai package not installed. "
+                "Run: pip install google-generativeai"
+            ),
             "response": None,
             "tools_called": [],
         }

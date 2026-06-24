@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import {
-  Plus, Tv, Film, Star, Loader2, Trash2,
-  Pencil, Bot, BarChart2, Search, TrendingUp
+  Plus, Tv, Film, Star, Loader2, Trash2, Bot, Search
 } from "lucide-react"
 import { Topbar } from "@/components/admin/topbar"
 import { api } from "@/lib/api"

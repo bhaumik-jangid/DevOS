@@ -10,7 +10,6 @@ from .serializers import DeploymentSerializer, DeploymentCreateSerializer
 from django.db.models import Count
 from django.conf import settings
 from apps.projects.models import Project
-from django.utils import timezone
 
 
 class DeploymentListView(generics.ListCreateAPIView):

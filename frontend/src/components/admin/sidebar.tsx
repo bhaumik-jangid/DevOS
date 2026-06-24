@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   Terminal, LayoutDashboard, FolderGit2, Activity,
-  Layers, LogOut, ChevronRight, Bell, Rocket,
+  Layers, LogOut, ChevronRight, Rocket,
   BarChart2, MessageSquare, BookOpen, Cpu, Bot,
   Settings, Link2, Tv, X, Menu
 } from "lucide-react"
@@ -50,7 +50,7 @@ export function Sidebar() {
       if (res.data.enabled?.length) {
         setEnabledServices(res.data.enabled)
       }
-    }).catch(() => {})
+    }).catch(() => { })
   }, [])
 
   const handleLogout = async () => {
@@ -65,7 +65,7 @@ export function Sidebar() {
     !item.service || enabledServices.includes(item.service)
   )
 
-  const NavContent = () => (
+  const navContent = (
     <div className="flex flex-col h-full">
       {/* Logo */}
       <div className="px-4 py-4 border-b border-zinc-800/60">
@@ -133,7 +133,7 @@ export function Sidebar() {
       {/* Desktop sidebar */}
       <aside className="hidden md:flex w-52 shrink-0 border-r border-zinc-800/60
                          bg-[#0e0e10] flex-col h-screen sticky top-0">
-        <NavContent />
+        {navContent}
       </aside>
 
       {/* Mobile topbar */}
@@ -172,7 +172,7 @@ export function Sidebar() {
               transition={{ type: "spring", damping: 30, stiffness: 300 }}
               className="fixed top-0 left-0 bottom-0 z-50 w-64
                          bg-[#0e0e10] border-r border-zinc-800/60 md:hidden">
-              <NavContent />
+              {navContent}
             </motion.aside>
           </>
         )}

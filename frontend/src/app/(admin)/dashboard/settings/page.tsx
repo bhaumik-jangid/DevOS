@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import {
-  Save, Loader2, User, Link2, Mail, Briefcase,
-  Globe, Layers, Shield, Bell, ChevronRight
+  Save, Loader2, User, Link2, Briefcase, Layers, Shield, ChevronRight
 } from "lucide-react"
 import { Topbar } from "@/components/admin/topbar"
 import { api } from "@/lib/api"

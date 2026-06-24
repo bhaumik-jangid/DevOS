@@ -4,7 +4,7 @@ Security middleware for DevOS.
 from __future__ import annotations
 
 import logging
-from django.http import JsonResponse, HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse
 from typing import Callable
 
 logger = logging.getLogger(__name__)

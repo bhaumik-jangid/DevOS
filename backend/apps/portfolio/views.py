@@ -197,6 +197,7 @@ class ContactSubmissionListView(APIView):
         ]
         return Response(data)
 
+
 class SiteConfigView(APIView):
     permission_classes = [AllowAny]
 

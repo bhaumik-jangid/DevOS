@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Any
-from rest_framework import generics, status
+from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -140,42 +139,43 @@ class WatchlistAIView(APIView):
             })
 
         if query_type == "recommend":
-            prompt = f"""Based on this user's streaming history, recommend 5 movies or series they would enjoy.
-
-Watched content (rated by user out of 10):
-{watch_context}
-
-Provide specific recommendations with:
-- Title
-- Why they would like it (based on their patterns)
-- Platform availability
-- Genre
-
-Be concise and specific. Base recommendations on actual patterns in their ratings and genres."""
+            prompt = (
+                "Based on this user's streaming history, recommend 5 movies "
+                "or series they would enjoy.\n\n"
+                "Watched content (rated by user out of 10):\n"
+                f"{watch_context}\n\n"
+                "Provide specific recommendations with:\n"
+                "- Title\n"
+                "- Why they would like it (based on their patterns)\n"
+                "- Platform availability\n"
+                "- Genre\n\n"
+                "Be concise and specific. Base recommendations on actual "
+                "patterns in their ratings and genres."
+            )
 
         elif query_type == "pattern":
-            prompt = f"""Analyze this user's streaming patterns and preferences.
-
-Watch history:
-{watch_context}
-
-Provide:
-1. Genre preferences (what they actually rate highly vs just watch)
-2. Platform distribution
-3. Content type preferences
-4. Viewing patterns
-5. What types of content they tend to drop
-
-Keep analysis factual and based on the data."""
+            prompt = (
+                "Analyze this user's streaming patterns and preferences.\n\n"
+                "Watch history:\n"
+                f"{watch_context}\n\n"
+                "Provide:\n"
+                "1. Genre preferences (what they actually rate highly vs just watch)\n"
+                "2. Platform distribution\n"
+                "3. Content type preferences\n"
+                "4. Viewing patterns\n"
+                "5. What types of content they tend to drop\n\n"
+                "Keep analysis factual and based on the data."
+            )
 
         elif query_type == "summary":
-            prompt = f"""Create a brief, interesting summary of this user's streaming life.
-
-Watch history:
-{watch_context}
-
-Include: total content, favorite genres, highest rated, longest ongoing series, etc.
-Keep it concise and personal."""
+            prompt = (
+                "Create a brief, interesting summary of this user's streaming life.\n\n"
+                "Watch history:\n"
+                f"{watch_context}\n\n"
+                "Include: total content, favorite genres, highest rated, "
+                "longest ongoing series, etc.\n"
+                "Keep it concise and personal."
+            )
 
         else:
             return Response({"error": "Invalid type. Use: recommend, pattern, summary"}, status=400)
@@ -213,21 +213,26 @@ class WatchItemAutofillView(APIView):
         if not api_key:
             return Response({"error": "GEMINI_API_KEY not configured"}, status=503)
 
-        prompt = f"""For the movie or TV series titled "{title}", provide the following details in JSON format only. Return ONLY valid JSON, no explanation, no markdown.
-
-{{
-  "title": "exact title",
-  "media_type": "series" or "movie" or "anime" or "documentary",
-  "release_year": number or null,
-  "total_seasons": number or null (null for movies),
-  "genres": ["genre1", "genre2"],
-  "platform": "netflix" or "prime" or "hotstar" or "jiocinema" or "youtube" or "other",
-  "language": "English" or other language,
-  "country": "country of origin",
-  "suggested_rating": number between 1-10 based on general reception or null
-}}
-
-For platform, pick the most popular streaming platform where this is commonly available in India."""
+        prompt = (
+            f'For the movie or TV series titled "{title}", provide the '
+            "following details in JSON format only. Return ONLY valid JSON, "
+            "no explanation, no markdown.\n\n"
+            "{\n"
+            '  "title": "exact title",\n'
+            '  "media_type": "series" or "movie" or "anime" or "documentary",\n'
+            '  "release_year": number or null,\n'
+            '  "total_seasons": number or null (null for movies),\n'
+            '  "genres": ["genre1", "genre2"],\n'
+            '  "platform": "netflix" or "prime" or "hotstar" or '
+            '"jiocinema" or "youtube" or "other",\n'
+            '  "language": "English" or other language,\n'
+            '  "country": "country of origin",\n'
+            '  "suggested_rating": number between 1-10 based on '
+            'general reception or null\n'
+            "}\n\n"
+            "For platform, pick the most popular streaming platform "
+            "where this is commonly available in India."
+        )
 
         try:
             import google.generativeai as genai
