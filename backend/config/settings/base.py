@@ -31,6 +31,8 @@ INSTALLED_APPS = [
     "apps.portfolio",
     "apps.alerts",
     "apps.mcp",
+    "apps.shortener",
+    "apps.watchlist",
 ]
 
 MIDDLEWARE = [
@@ -169,3 +171,32 @@ else:
     }
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+
+# Microservice registry — each service can be toggled independently
+MICROSERVICES = {
+    "portfolio": {
+        "label": "Portfolio",
+        "description": "Public portfolio, blog, contact form",
+        "default_enabled": True,
+    },
+    "projects": {
+        "label": "Projects",
+        "description": "Project registry and monitoring",
+        "default_enabled": True,
+    },
+    "shortener": {
+        "label": "URL Shortener",
+        "description": "Personal short link management",
+        "default_enabled": True,
+    },
+    "watchlist": {
+        "label": "Watchlist",
+        "description": "Streaming tracker and AI recommendations",
+        "default_enabled": True,
+    },
+    "mcp": {
+        "label": "MCP & AI",
+        "description": "AI assistant and MCP tool explorer",
+        "default_enabled": True,
+    },
+}

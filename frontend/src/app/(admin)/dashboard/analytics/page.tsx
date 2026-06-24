@@ -14,7 +14,7 @@ interface AnalyticsData {
   views_7d: number
   top_pages: { path: string; count: number }[]
   daily_chart: { date: string; count: number }[]
-  recent: { path: string; referrer: string; viewed_at: string }[]
+  recent: { path: string; referrer: string; timestamp: string }[]
 }
 
 function SimpleBarChart({ data }: { data: { date: string; count: number }[] }) {
@@ -48,6 +48,7 @@ export default function AnalyticsPage() {
   useEffect(() => {
     api.get("/core/analytics/").then((res) => {
       setData(res.data)
+      console.log("Analytics data:", res.data)
     }).finally(() => setLoading(false))
   }, [])
 
@@ -169,7 +170,7 @@ export default function AnalyticsPage() {
                   </p>
                 </div>
                 <p className="text-xs text-zinc-600 font-mono shrink-0 ml-3">
-                  {new Date(view.viewed_at).toLocaleTimeString()}
+                  {new Date(view.timestamp).toLocaleTimeString()}
                 </p>
               </div>
             ))}

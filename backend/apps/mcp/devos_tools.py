@@ -337,3 +337,84 @@ def get_contact_submissions(
             for s in qs[:limit]
         ]
     }
+
+
+@registry.register(
+    name="get_watchlist_summary",
+    description=(
+        "Get a summary of the user's streaming watchlist — "
+        "counts by status, top rated content, and platform distribution."
+    ),
+    input_schema={
+        "type": "object",
+        "properties": {
+            "status": {
+                "type": "string",
+                "description": "Filter by status: watching, completed, dropped, plan_to_watch",
+                "enum": ["watching", "completed", "dropped", "plan_to_watch"],
+            }
+        },
+        "required": [],
+    },
+)
+def get_watchlist_summary(status: str = "") -> dict[str, Any]:
+    from apps.watchlist.models import WatchItem
+    from django.db.models import Avg, Count
+
+    qs = WatchItem.objects.all()
+    if status:
+        qs = qs.filter(status=status)
+
+    total = qs.count()
+    avg_rating = qs.filter(
+        personal_rating__isnull=False
+    ).aggregate(avg=Avg("personal_rating"))["avg"]
+
+    top_rated = list(
+        qs.filter(personal_rating__isnull=False)
+        .order_by("-personal_rating")[:5]
+        .values("title", "personal_rating", "media_type", "platform")
+    )
+
+    currently_watching = list(
+        WatchItem.objects.filter(status="watching")
+        .values("title", "media_type", "watched_seasons", "total_seasons", "platform")
+    )
+
+    return {
+        "total": total,
+        "currently_watching": currently_watching,
+        "top_rated": top_rated,
+        "average_rating": round(float(avg_rating), 2) if avg_rating else None,
+    }
+
+
+@registry.register(
+    name="notify_new_seasons",
+    description=(
+        "Check for series with notify_new_season enabled "
+        "and send Telegram alerts for ones that may have new seasons."
+    ),
+    input_schema={
+        "type": "object",
+        "properties": {},
+        "required": [],
+    },
+)
+def notify_new_seasons() -> dict[str, Any]:
+    from apps.watchlist.models import WatchItem
+
+    series = WatchItem.objects.filter(
+        media_type__in=["series", "anime"],
+        status__in=["watching", "completed"],
+        notify_new_season=True,
+    )
+
+    return {
+        "series_tracked": series.count(),
+        "titles": list(series.values(
+            "id", "title", "watched_seasons",
+            "total_seasons", "platform", "last_notified_season"
+        )),
+        "note": "Use this data to check TMDB or notify user of potential new seasons.",
+    }

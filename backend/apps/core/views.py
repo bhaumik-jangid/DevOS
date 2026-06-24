@@ -36,10 +36,10 @@ class AnalyticsSummaryView(APIView):
         now = timezone.now()
         last_30 = now - timedelta(days=30)
         last_7 = now - timedelta(days=7)
-
+        print("Pageview : " + str(PageView));
         total_views = PageView.objects.count()
-        views_30d = PageView.objects.filter(viewed_at__gte=last_30).count()
-        views_7d = PageView.objects.filter(viewed_at__gte=last_7).count()
+        views_30d = PageView.objects.filter(timestamp__gte=last_30).count()
+        views_7d = PageView.objects.filter(timestamp__gte=last_7).count()
 
         # Top pages
         top_pages = (
@@ -52,20 +52,20 @@ class AnalyticsSummaryView(APIView):
         # Daily breakdown for chart — last 30 days
         daily = (
             PageView.objects
-            .filter(viewed_at__gte=last_30)
-            .annotate(date=TruncDate("viewed_at"))
+            .filter(timestamp__gte=last_30)
+            .annotate(date=TruncDate("timestamp"))
             .values("date")
             .annotate(count=Count("id"))
             .order_by("date")
         )
 
         # Recent views
-        recent = PageView.objects.order_by("-viewed_at")[:20]
+        recent = PageView.objects.order_by("-timestamp")[:20]
         recent_data = [
             {
                 "path": v.path,
                 "referrer": v.referrer,
-                "viewed_at": v.viewed_at.isoformat(),
+                "timestamp": v.timestamp.isoformat(),
             }
             for v in recent
         ]
@@ -81,3 +81,28 @@ class AnalyticsSummaryView(APIView):
             ],
             "recent": recent_data,
         })
+
+
+class ServiceListView(APIView):
+    """GET /api/v1/core/services/ — returns enabled microservices."""
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        from .models import SiteConfig
+        config = SiteConfig.get()
+        return Response({"enabled": config.enabled_services})
+
+
+class ServiceUpdateView(APIView):
+    """POST /api/v1/core/services/update/ — toggle microservices (auth)."""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        from .models import SiteConfig
+        enabled = request.data.get("enabled", [])
+        if not isinstance(enabled, list):
+            return Response({"error": "enabled must be a list"}, status=400)
+        config = SiteConfig.get()
+        config.enabled_services = enabled
+        config.save()
+        return Response({"enabled": config.enabled_services})

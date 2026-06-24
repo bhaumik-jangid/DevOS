@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from apps.core.health import HealthView
+from apps.shortener.views import RedirectView
 from django.http import JsonResponse
 from django.conf import settings
 from django.conf.urls.static import static
@@ -13,6 +14,7 @@ def health_check(request):
 urlpatterns = [
     path("devos-control/", admin.site.urls),
     path("api/health/", HealthView.as_view(), name="health"),
+    path("s/<str:code>/", RedirectView.as_view(), name="shortlink-redirect"),
     # old: health_check, name="health-check"),
     path("api/v1/", include([
         path("auth/", include("apps.accounts.urls")),
@@ -23,6 +25,8 @@ urlpatterns = [
         path("alerts/", include("apps.alerts.urls")),
         path("core/", include("apps.core.urls")),
         path("mcp/", include("apps.mcp.urls")),
+        path("watchlist/", include("apps.watchlist.urls")),
+        path("shortener/", include("apps.shortener.urls")),
     ])),
 ]
 

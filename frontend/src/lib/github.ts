@@ -12,6 +12,7 @@ export interface GitHubRepo {
 }
 
 export interface GitHubStats {
+  username: string
   public_repos: number
   followers: number
   following: number
@@ -100,6 +101,38 @@ export async function getGitHubPinnedRepos(): Promise<GitHubRepo[]> {
   }
 }
 
+export async function getGitHubRepos(): Promise<GitHubRepo[]> {
+  if (!GITHUB_USERNAME) return []
+  try {
+    const res = await fetch(
+      `https://api.github.com/users/${GITHUB_USERNAME}/repos?sort=updated&per_page=20&type=owner`,
+      { headers, next: { revalidate: 3600 } }
+    )
+    if (!res.ok) return []
+    const repos: GitHubRepo[] = await res.json()
+    return repos.filter((r) => !r.forks_count).slice(0, 12)
+  } catch {
+    return []
+  }
+}
+
+export function getLanguageColor(language: string): string {
+  const colors: Record<string, string> = {
+    TypeScript: "#3178c6",
+    JavaScript: "#f1e05a",
+    Python: "#3572A5",
+    Rust: "#dea584",
+    Go: "#00ADD8",
+    Java: "#b07219",
+    "C++": "#f34b7d",
+    CSS: "#563d7c",
+    HTML: "#e34c26",
+    Shell: "#89e051",
+    Dockerfile: "#384d54",
+  }
+  return colors[language] || "#6e7681"
+}
+
 async function getGitHubReposFallback(): Promise<GitHubRepo[]> {
   if (!GITHUB_USERNAME) return []
   try {
@@ -125,7 +158,13 @@ export async function getGitHubStats(): Promise<GitHubStats | null> {
       { headers, next: { revalidate: 3600 } }
     )
     if (!res.ok) return null
-    return res.json()
+
+    const { login, ...rest } = await res.json()
+
+    return {
+      username: login,
+      ...rest,
+    }
   } catch {
     return null
   }

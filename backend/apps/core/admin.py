@@ -4,11 +4,18 @@ from .models import PageView, DailyStat
 
 @admin.register(PageView)
 class PageViewAdmin(admin.ModelAdmin):
-    list_display = ["path", "country", "viewed_at"]
+    list_display = ["path", "ip_address", "timestamp"]
     list_filter = ["path"]
-    readonly_fields = ["viewed_at"]
+    readonly_fields = ["timestamp"]
 
 
 @admin.register(DailyStat)
 class DailyStatAdmin(admin.ModelAdmin):
-    list_display = ["date", "total_views", "unique_paths"]
+    list_display = ["date", "page_views", "unique_visitors"]
+
+from .models import SiteConfig
+
+
+@admin.register(SiteConfig)
+class SiteConfigAdmin(admin.ModelAdmin):
+    pass
