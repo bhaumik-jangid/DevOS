@@ -48,7 +48,6 @@ export default function AnalyticsPage() {
   useEffect(() => {
     api.get("/core/analytics/").then((res) => {
       setData(res.data)
-      console.log("Analytics data:", res.data)
     }).finally(() => setLoading(false))
   }, [])
 

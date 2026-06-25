@@ -11,7 +11,7 @@ const statusColors: Record<string, string> = {
 
 export function ProjectCard({ project }: { project: Project }) {
   return (
-    <Link href={`/projects/${project.slug}`}>
+    <Link href={project.slug ? `/projects/${project.slug}/` : "#"}>
       <article className="group border border-zinc-800/60 rounded-xl p-5
                           bg-zinc-900/20 hover:border-zinc-700 hover:bg-zinc-900/40
                           transition-all duration-200 h-full">

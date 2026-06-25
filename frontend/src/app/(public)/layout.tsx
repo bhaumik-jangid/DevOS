@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import { NavBar } from "@/components/public/navbar"
 import { Footer } from "@/components/public/footer"
 import { PageTracker } from "@/components/public/page-tracker"
-import { VideoBubble } from "@/components/public/video-bubble"
+import { VideoBubbleWrapper } from "@/components/shared/video-bubble-wrapper"
 import { getProfile, getSiteConfig } from "@/lib/portfolio-api"
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -61,7 +61,7 @@ export default async function PublicLayout({ children }: { children: React.React
       <NavBar />
       <main>{children}</main>
       <Footer config={config} />
-      <VideoBubble videoUrl={videoUrl} tooltips={tooltips} />
+      <VideoBubbleWrapper />
     </div>
   )
 }

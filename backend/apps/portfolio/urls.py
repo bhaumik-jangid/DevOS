@@ -1,5 +1,9 @@
 from django.urls import path
 from .views import (
+    ProfileUpdateView,
+    SkillAdminView, SkillAdminDetailView,
+    ExperienceAdminView, ExperienceAdminDetailView,
+    ProfilePhotoUploadView,
     SiteConfigView,
     ProfileView, AcademicListView, AchievementListView,
     SkillListView, ExperienceListView, CertificationListView,
@@ -25,4 +29,10 @@ urlpatterns = [
     path("contact/submissions/", ContactSubmissionListView.as_view()),
     path("config/", SiteConfigView.as_view()),
     path("config/update/", SiteConfigView.as_view()),
+    path("skills/admin/", SkillAdminView.as_view()),
+    path("skills/admin/<int:pk>/", SkillAdminDetailView.as_view()),
+    path("experience/admin/", ExperienceAdminView.as_view()),
+    path("experience/admin/<int:pk>/", ExperienceAdminDetailView.as_view()),
+    path("profile/photo/", ProfilePhotoUploadView.as_view()),
+    path("profile/update/", ProfileUpdateView.as_view()),
 ]

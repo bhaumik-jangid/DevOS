@@ -42,11 +42,14 @@ class RequestLoggingMiddleware:
         duration_ms = round((time.monotonic() - start) * 1000)
 
         if request.path.startswith("/api/"):
-            logger.info(
-                "%s %s %s %dms",
+            level = logger.warning if response.status_code >= 400 else logger.info
+            level(
+                "%s %s %s %dms | referer=%s | ua=%s",
                 request.method,
                 request.path,
                 response.status_code,
                 duration_ms,
+                request.META.get("HTTP_REFERER", "-"),
+                request.META.get("HTTP_USER_AGENT", "-")[:60],
             )
         return response

@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { useAuthStore } from "@/lib/auth-store"
 import { Sidebar } from "@/components/admin/sidebar"
+import { VideoBubbleWrapper } from "@/components/shared/video-bubble-wrapper"
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
@@ -30,6 +31,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <div className="flex-1 flex flex-col min-w-0 pt-14 md:pt-0">
         {children}
       </div>
+      <VideoBubbleWrapper />
     </div>
   )
 }

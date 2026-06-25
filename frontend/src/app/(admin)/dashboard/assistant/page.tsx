@@ -241,7 +241,7 @@ export default function AssistantPage() {
             className="flex items-center gap-1.5 bg-amber-500 hover:bg-amber-400
                        disabled:bg-zinc-800 disabled:text-zinc-600
                        text-black text-xs font-medium px-3 py-2 rounded-lg
-                       transition-colors shrink-0 min-h-[36px]">
+                       transition-colors shrink-0 min-h-9">
             {loading
               ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
               : <Send className="w-3.5 h-3.5" />

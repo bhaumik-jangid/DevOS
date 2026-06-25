@@ -10,6 +10,36 @@ class ProfileSerializer(serializers.ModelSerializer):
         model = Profile
         exclude = ["updated_at"]
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+
+        media_fields = [
+            "photo_primary",
+            "photo_secondary",
+            "resume",
+        ]
+
+        for field_name in media_fields:
+            field = getattr(instance, field_name)
+
+            if not field:
+                data[field_name] = None
+                continue
+
+            value = str(field)
+
+            # External URL already stored in DB
+            if value.startswith(("http://", "https://")):
+                data[field_name] = value
+            else:
+                # Normal Django media file
+                try:
+                    data[field_name] = field.url
+                except ValueError:
+                    data[field_name] = value
+
+        return data
+
 
 class AcademicSerializer(serializers.ModelSerializer):
     class Meta:

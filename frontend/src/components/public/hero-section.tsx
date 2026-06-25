@@ -23,7 +23,7 @@ const item = {
 }
 
 export function HeroSection({ profile, config }: HeroSectionProps) {
-  const heroBg = profile?.photo_primary ? `${BACKEND}${profile.photo_primary}` : null
+  const heroBg = profile?.photo_primary ? `${profile.photo_primary}` : null
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
@@ -147,7 +147,7 @@ export function HeroSection({ profile, config }: HeroSectionProps) {
               </Link>
 
               {profile?.resume && (
-                <a href={`${BACKEND}${profile.resume}`}
+                <a href={`${profile.resume}`}
                   target="_blank" rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 text-zinc-500
                              hover:text-white text-sm transition-colors

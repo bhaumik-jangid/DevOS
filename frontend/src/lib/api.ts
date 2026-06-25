@@ -1,3 +1,4 @@
+import { attachDebugInterceptors } from "./debug"
 import axios, { AxiosError, InternalAxiosRequestConfig } from "axios"
 
 const BASE_URL = (
@@ -53,3 +54,5 @@ api.interceptors.response.use(
     return Promise.reject(error)
   }
 )
+
+attachDebugInterceptors(api)

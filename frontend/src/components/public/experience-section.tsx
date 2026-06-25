@@ -17,7 +17,7 @@ export function ExperienceSection({ experience }: { experience: Experience[] }) 
         <AnimatedList className="space-y-8 pl-5 sm:pl-6">
           {experience.map((exp) => (
             <AnimatedItem key={exp.id} className="relative">
-              <div className="absolute -left-[21px] sm:-left-[25px] top-1.5
+              <div className="absolute -left-5.25 sm:-left-6.25 top-1.5
                               w-2 h-2 rounded-full bg-amber-500
                               border-2 border-[#111113]" />
               <div className="flex flex-col sm:flex-row sm:items-start

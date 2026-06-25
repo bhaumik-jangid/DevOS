@@ -15,6 +15,9 @@ from .serializers import (
     SkillSerializer, ExperienceSerializer, CertificationSerializer,
     BlogPostSerializer, BlogPostDetailSerializer
 )
+from rest_framework.parsers import MultiPartParser, FormParser
+from apps.alerts.services import alert_contact_form
+
 
 logger = logging.getLogger(__name__)
 
@@ -154,7 +157,6 @@ class ContactFormView(APIView):
             page=page[:200],
         )
 
-        from apps.alerts.services import alert_contact_form
         alert = alert_contact_form(
             name=name,
             email=email,
@@ -239,3 +241,78 @@ class SiteConfigView(APIView):
 
     def post(self, request):
         return self._update_profile(request)
+
+
+class ProfilePhotoUploadView(APIView):
+    """POST /api/v1/portfolio/profile/photo/ — upload photo to Cloudinary."""
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
+
+    def post(self, request):
+        profile = Profile.objects.first()
+        if not profile:
+            return Response({"detail": "No profile found"}, status=404)
+
+        photo = request.FILES.get("photo")
+        if not photo:
+            return Response({"detail": "No photo file provided"}, status=400)
+
+        profile.photo_primary = photo
+        profile.save()
+
+        return Response({
+            "photo_primary": profile.photo_primary.url if profile.photo_primary else None,
+            "detail": "Photo updated successfully"
+        })
+
+
+class SkillAdminView(generics.ListCreateAPIView):
+    """Admin — full CRUD for skills."""
+    permission_classes = [IsAuthenticated]
+    serializer_class = SkillSerializer
+    queryset = Skill.objects.all().order_by("category", "order", "name")
+
+
+class SkillAdminDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """Admin — edit/delete individual skill."""
+    permission_classes = [IsAuthenticated]
+    serializer_class = SkillSerializer
+    queryset = Skill.objects.all()
+
+
+class ExperienceAdminView(generics.ListCreateAPIView):
+    """Admin — full CRUD for experience."""
+    permission_classes = [IsAuthenticated]
+    serializer_class = ExperienceSerializer
+    queryset = Experience.objects.all().order_by("-start_date")
+
+
+class ExperienceAdminDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """Admin — edit/delete individual experience."""
+    permission_classes = [IsAuthenticated]
+    serializer_class = ExperienceSerializer
+    queryset = Experience.objects.all()
+
+
+class ProfileUpdateView(APIView):
+    """PATCH /api/v1/portfolio/profile/update/ — update profile fields."""
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request):
+        profile = Profile.objects.first()
+        if not profile:
+            return Response({"detail": "No profile found"}, status=404)
+
+        allowed_fields = [
+            "name", "tagline", "bio", "email", "phone",
+            "github_url", "linkedin_url", "twitter_url",
+            "location", "available_for_work",
+            "video_tooltips", "hero_video"
+        ]
+
+        for field in allowed_fields:
+            if field in request.data:
+                setattr(profile, field, request.data[field])
+
+        profile.save()
+        return Response(ProfileSerializer(profile).data)

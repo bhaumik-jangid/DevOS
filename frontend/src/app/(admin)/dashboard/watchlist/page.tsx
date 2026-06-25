@@ -215,7 +215,7 @@ export default function WatchlistPage() {
                   className="flex items-center gap-1.5 border border-zinc-700
                              hover:border-amber-500/40 text-zinc-400 hover:text-amber-400
                              text-xs px-3 py-2 rounded-lg transition-colors
-                             disabled:opacity-50 whitespace-nowrap h-[38px]">
+                             disabled:opacity-50 whitespace-nowrap h-9.5">
                   {autofilling
                     ? <><Loader2 className="w-3.5 h-3.5 animate-spin" />Fetching...</>
                     : <><Bot className="w-3.5 h-3.5" />AI autofill</>
