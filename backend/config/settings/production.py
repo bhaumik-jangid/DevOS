@@ -38,3 +38,6 @@ DATABASES["default"]["OPTIONS"] = {
     "connect_timeout": 10,
     "sslmode": "require",
 }
+
+# Disable redirect loops through Vercel proxy
+APPEND_SLASH = False

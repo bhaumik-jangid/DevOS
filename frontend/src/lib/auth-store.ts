@@ -26,7 +26,7 @@ export const useAuthStore = create<AuthStore>()(
       login: async (email, password) => {
         set({ isLoading: true })
         try {
-          const { data } = await api.post("/auth/login/", { email, password })
+          const { data } = await api.post("/auth/login///", { email, password })
           localStorage.setItem("access_token", data.access)
           localStorage.setItem("refresh_token", data.refresh)
           document.cookie = `access_token=${data.access}; path=/; max-age=3600; SameSite=Strict`
@@ -47,7 +47,7 @@ export const useAuthStore = create<AuthStore>()(
         const { refreshToken } = get()
         try {
           if (refreshToken) {
-            await api.post("/auth/logout/", { refresh: refreshToken })
+            await api.post("/auth/logout///", { refresh: refreshToken })
           }
         } finally {
           localStorage.removeItem("access_token")
@@ -64,7 +64,7 @@ export const useAuthStore = create<AuthStore>()(
 
       fetchMe: async () => {
         try {
-          const { data } = await api.get("/auth/me/")
+          const { data } = await api.get("/auth/me///")
           set({ user: data, isAuthenticated: true })
         } catch {
           get().logout()

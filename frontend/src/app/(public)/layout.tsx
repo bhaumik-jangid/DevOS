@@ -40,20 +40,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
-  const profile = await getProfile()
   const config = await getSiteConfig()
-
-  const BACKEND = process.env.INTERNAL_API_URL?.replace("/api/v1", "") || "http://backend:8000"
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const videoUrl = (profile as any)?.hero_video
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ? `${BACKEND}${(profile as any).hero_video}`
-    : undefined
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const tooltips = (profile as any)?.video_tooltips?.length
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ? (profile as any).video_tooltips
-    : undefined
 
   return (
     <div className="min-h-screen bg-[#111113] text-white">

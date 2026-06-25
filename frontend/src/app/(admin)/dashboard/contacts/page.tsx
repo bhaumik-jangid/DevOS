@@ -24,7 +24,7 @@ export default function ContactsPage() {
   const [selected, setSelected] = useState<Submission | null>(null)
 
   useEffect(() => {
-    api.get("/portfolio/contact/submissions/").then((res) => {
+    api.get("/portfolio/contact////submissions/").then((res) => {
       setSubmissions(res.data)
     }).finally(() => setLoading(false))
   }, [])

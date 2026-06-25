@@ -3,8 +3,6 @@
 import { useEffect, useState } from "react"
 import { VideoBubble } from "@/components/public/video-bubble"
 
-const BACKEND = process.env.NEXT_PUBLIC_API_URL?.replace("/api/v1", "") || ""
-
 export function VideoBubbleWrapper() {
   const [videoUrl, setVideoUrl] = useState<string | undefined>()
   const [tooltips, setTooltips] = useState<string[]>([])
@@ -12,8 +10,12 @@ export function VideoBubbleWrapper() {
   useEffect(() => {
     const API = process.env.NEXT_PUBLIC_API_URL || "/api/v1"
     fetch(`${API}/portfolio/profile/`)
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) return null
+        return r.json()
+      })
       .then((data) => {
+        if (!data) return
         if (data.hero_video) {
           setVideoUrl(data.hero_video)
         }

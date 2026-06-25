@@ -80,7 +80,7 @@ export default function SettingsPage() {
   useEffect(() => {
     Promise.all([
       api.get("/portfolio/config/"),
-      api.get("/portfolio/profile/"),
+      api.get("/portfolio/profile////"),
       api.get("/core/services/").catch(() => ({ data: { enabled: [] } })),
     ]).then(([configRes, profileRes, servicesRes]) => {
       setConfig((prev) => ({ ...prev, ...configRes.data }))
@@ -128,7 +128,7 @@ export default function SettingsPage() {
         api.post("/portfolio/config/update/", config),
         api.post("/core/services/update/", { enabled: enabledServices }),
         // Save video tooltips to profile
-        api.patch("/portfolio/profile/update/", {
+        api.patch("/portfolio/profile////update/", {
           video_tooltips: media.video_tooltips,
           hero_video: media.hero_video,
         }).catch(() => {}),
@@ -159,7 +159,7 @@ export default function SettingsPage() {
     formData.append("photo", file)
 
     try {
-      const res = await api.post("/portfolio/profile/photo/", formData, {
+      const res = await api.post("/portfolio/profile////photo/", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       })
       setMedia((prev) => ({ ...prev, photo_primary: res.data.photo_primary }))

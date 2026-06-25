@@ -31,7 +31,7 @@ export function ContactForm({ page = "/" }: ContactFormProps) {
 
     try {
       const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8090/api/v1"
-      const res = await fetch(`${API}/portfolio/contact/`, {
+      const res = await fetch(`${API}/portfolio/contact////`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
