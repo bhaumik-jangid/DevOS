@@ -1,9 +1,10 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { toast } from "sonner"
+import { Mail, CheckCircle, Send, Trash2 } from "lucide-react"
 import { Topbar } from "@/components/admin/topbar"
 import { api } from "@/lib/api"
-import { Mail, CheckCircle, Send } from "lucide-react"
 
 interface Submission {
   id: number
@@ -23,11 +24,34 @@ export default function ContactsPage() {
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState<Submission | null>(null)
 
-  useEffect(() => {
+  const fetchSubmissions = () => {
     api.get("/portfolio/contact/submissions/").then((res) => {
       setSubmissions(res.data)
     }).finally(() => setLoading(false))
-  }, [])
+  }
+
+  useEffect(() => { fetchSubmissions() }, [])
+
+  const handleDelete = async (id: number, name: string) => {
+    if (!confirm(`Delete message from ${name}? This cannot be undone.`)) return
+    try {
+      await api.delete(`/portfolio/contact/submissions/${id}/`)
+      toast.success("Message deleted")
+      if (selected?.id === id) setSelected(null)
+      fetchSubmissions()
+    } catch {
+      toast.error("Failed to delete")
+    }
+  }
+
+  const handleMarkRead = async (submission: Submission) => {
+    try {
+      // Mark as read by selecting it — in future can add explicit endpoint
+      setSelected(submission)
+    } catch {
+      toast.error("Failed to update")
+    }
+  }
 
   return (
     <>
@@ -39,7 +63,7 @@ export default function ContactsPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-full">
 
           {/* List */}
-          <div className="border border-zinc-800/60 rounded-xl overflow-hidden lg:col-span-1">
+          <div className="border border-zinc-800/60 rounded-xl overflow-hidden">
             <div className="divide-y divide-zinc-800/40">
               {loading && (
                 <div className="px-5 py-8 text-center">
@@ -52,27 +76,42 @@ export default function ContactsPage() {
                 </div>
               )}
               {submissions.map((sub) => (
-                <button key={sub.id} onClick={() => setSelected(sub)}
-                  className={`w-full text-left px-4 py-3 hover:bg-zinc-800/20
-                              transition-colors ${selected?.id === sub.id ? "bg-zinc-800/30" : ""}`}>
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <p className="text-sm text-white font-medium truncate">{sub.name}</p>
-                      <p className="text-xs text-zinc-600 truncate">{sub.email}</p>
+                <div key={sub.id}
+                  className={`group relative hover:bg-zinc-800/20 transition-colors ${
+                    selected?.id === sub.id ? "bg-zinc-800/30" : ""
+                  }`}>
+                  <button
+                    onClick={() => handleMarkRead(sub)}
+                    className="w-full text-left px-4 py-3 pr-10">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="text-sm text-white font-medium truncate">{sub.name}</p>
+                        <p className="text-xs text-zinc-600 truncate">{sub.email}</p>
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        {sub.telegram_sent && (
+                          <Send className="w-3 h-3 text-emerald-500" />
+                        )}
+                        {!sub.is_read && (
+                          <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                        )}
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1 shrink-0">
-                      {sub.telegram_sent && (
-                        <Send className="w-3 h-3 text-emerald-500" />
-                      )}
-                      {!sub.is_read && (
-                        <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                      )}
-                    </div>
-                  </div>
-                  <p className="text-xs text-zinc-600 font-mono mt-0.5">
-                    {new Date(sub.submitted_at).toLocaleDateString()}
-                  </p>
-                </button>
+                    <p className="text-xs text-zinc-600 font-mono mt-0.5">
+                      {new Date(sub.submitted_at).toLocaleDateString()}
+                    </p>
+                  </button>
+
+                  {/* Delete button — visible on hover */}
+                  <button
+                    onClick={() => handleDelete(sub.id, sub.name)}
+                    className="absolute top-3 right-2 p-1.5 rounded-lg
+                               opacity-0 group-hover:opacity-100
+                               text-zinc-600 hover:text-red-400
+                               hover:bg-red-500/10 transition-all">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               ))}
             </div>
           </div>
@@ -99,9 +138,18 @@ export default function ContactsPage() {
                   <div className="flex items-center gap-2">
                     {selected.telegram_sent && (
                       <span className="flex items-center gap-1 text-xs text-emerald-400 font-mono">
-                        <CheckCircle className="w-3 h-3" />Telegram sent
+                        <CheckCircle className="w-3 h-3" />Sent
                       </span>
                     )}
+                    <button
+                      onClick={() => handleDelete(selected.id, selected.name)}
+                      className="flex items-center gap-1.5 text-xs text-zinc-500
+                                 hover:text-red-400 border border-zinc-800
+                                 hover:border-red-500/30 px-2.5 py-1.5 rounded-lg
+                                 transition-colors">
+                      <Trash2 className="w-3 h-3" />
+                      Delete
+                    </button>
                   </div>
                 </div>
 

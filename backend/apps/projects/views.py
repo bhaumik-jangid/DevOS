@@ -49,3 +49,27 @@ class ProjectDetailView(generics.RetrieveUpdateDestroyAPIView):
         if str(lookup).isdigit():
             return generics.get_object_or_404(queryset, id=lookup)
         return generics.get_object_or_404(queryset, slug=lookup)
+    
+
+class ProjectAliasRedirectView(generics.GenericAPIView):
+    """
+    GET /api/v1/projects/alias/<alias>/
+    Returns the live_url for a project with the given alias (or slug).
+    Used by Vercel middleware to redirect subdomain traffic.
+    """
+    permission_classes = [AllowAny]
+
+    def get(self, request, alias: str):
+        project = (
+            Project.objects.filter(alias=alias, is_public=True).first()
+            or Project.objects.filter(slug=alias, is_public=True).first()
+        )
+        if not project:
+            return Response({"detail": "Not found"}, status=404)
+        if not project.live_url:
+            return Response({"detail": "No live URL configured"}, status=404)
+        return Response({
+            "alias": alias,
+            "project": project.name,
+            "live_url": project.live_url,
+        })

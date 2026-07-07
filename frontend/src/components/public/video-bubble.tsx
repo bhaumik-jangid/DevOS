@@ -42,7 +42,6 @@ export function VideoBubble({ videoUrl, tooltips = DEFAULT_TOOLTIPS }: VideoBubb
   }
 
   if (!videoUrl) return null
-  console.log("Rendering VideoBubble with videoUrl:", videoUrl, "and tooltips:", tooltips)
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2">
 

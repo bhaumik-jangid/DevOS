@@ -26,6 +26,10 @@ class Project(models.Model):
     stack_tags = models.JSONField(default=list)
     github_url = models.URLField(blank=True)
     live_url = models.URLField(blank=True)
+    alias = models.SlugField(
+        max_length=100, blank=True,
+        help_text="Subdomain alias e.g. 'agripool' → agripool.bhaumikjangid.me"
+    )
     cover_image = models.ImageField(upload_to="projects/", null=True, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="active")
     hosting_provider = models.CharField(max_length=20, choices=HOSTING_CHOICES, blank=True)

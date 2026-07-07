@@ -28,6 +28,7 @@ interface ProjectFormData {
   is_public: boolean
   notes: string
   order: number
+  alias?: string
 }
 
 const defaults: ProjectFormData = {
@@ -79,7 +80,7 @@ export function ProjectForm({ initial, projectId }: Props) {
       }
       router.push("/dashboard/projects")
       router.refresh()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       const data = err.response?.data
       if (data && typeof data === "object") {
@@ -96,6 +97,11 @@ export function ProjectForm({ initial, projectId }: Props) {
       setSaving(false)
     }
   }
+
+  const inputCls = `w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-3 py-2.5
+                    text-white text-sm placeholder-zinc-600
+                    focus:outline-none focus:border-amber-500/60 focus:ring-1
+                    focus:ring-amber-500/20 transition-colors`
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8 max-w-2xl">
@@ -174,6 +180,19 @@ export function ProjectForm({ initial, projectId }: Props) {
                 placeholder="https://myproject.dev"
                 type="url"
               />
+
+              <div>
+                <label className="block text-xs text-zinc-500 font-mono uppercase tracking-wider mb-1.5">
+                  Subdomain alias
+                  <span className="text-zinc-600 ml-1 normal-case">(e.g. agripool → agripool.bhaumikjangid.me)</span>
+                </label>
+                <input
+                  value={form.alias || ""}
+                  onChange={(e) => set("alias", e.target.value)}
+                  placeholder="agripool (defaults to slug if empty)"
+                  className={inputCls}
+                />
+              </div>
             </FormField>
             <FormField label="Frontend URL" error={errors.frontend_url}>
               <Input

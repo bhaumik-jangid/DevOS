@@ -57,6 +57,7 @@ export interface Project {
   stack_tags: string[]
   github_url: string
   live_url: string
+  alias: string
   cover_image: string | null
   status: "active" | "maintenance" | "archived" | "in_progress"
   hosting_provider: string
