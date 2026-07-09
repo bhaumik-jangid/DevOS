@@ -10,8 +10,6 @@ interface HeroSectionProps {
   config: Record<string, string>
 }
 
-const BACKEND = process.env.NEXT_PUBLIC_API_URL?.replace("/api/v1", "") || "http://localhost:8090"
-
 const container = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.07, delayChildren: 0.1 } }

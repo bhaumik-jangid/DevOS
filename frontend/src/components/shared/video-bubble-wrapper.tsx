@@ -3,8 +3,6 @@
 import { useEffect, useState } from "react"
 import { VideoBubble } from "@/components/public/video-bubble"
 
-const BACKEND = process.env.NEXT_PUBLIC_API_URL?.replace("/api/v1", "") || ""
-
 export function VideoBubbleWrapper() {
   const [videoUrl, setVideoUrl] = useState<string | undefined>()
   const [tooltips, setTooltips] = useState<string[]>([])

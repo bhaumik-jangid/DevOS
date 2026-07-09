@@ -2,6 +2,7 @@ from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .models import Project
 from .serializers import ProjectSerializer, ProjectDetailSerializer, ProjectWriteSerializer
+from rest_framework.response import Response
 
 
 class ProjectListView(generics.ListCreateAPIView):
@@ -49,7 +50,7 @@ class ProjectDetailView(generics.RetrieveUpdateDestroyAPIView):
         if str(lookup).isdigit():
             return generics.get_object_or_404(queryset, id=lookup)
         return generics.get_object_or_404(queryset, slug=lookup)
-    
+
 
 class ProjectAliasRedirectView(generics.GenericAPIView):
     """
@@ -68,6 +69,7 @@ class ProjectAliasRedirectView(generics.GenericAPIView):
             return Response({"detail": "Not found"}, status=404)
         if not project.live_url:
             return Response({"detail": "No live URL configured"}, status=404)
+        print(f"Redirecting alias '{alias}' to live URL: {project.live_url}")
         return Response({
             "alias": alias,
             "project": project.name,

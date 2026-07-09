@@ -10,6 +10,7 @@ const mockProject: Project = {
   stack_tags: ["Next.js", "Django", "PostgreSQL"],
   github_url: "https://github.com/test/devos",
   live_url: "https://devos.dev",
+  alias: "devos",
   cover_image: null,
   status: "active",
   hosting_provider: "vercel",

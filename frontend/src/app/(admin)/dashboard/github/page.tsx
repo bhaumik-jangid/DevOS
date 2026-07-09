@@ -28,26 +28,37 @@ export default function GitHubReposPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
 
-  const fetchAll = async () => {
-    setLoading(true)
-    try {
-      const [profileRes] = await Promise.all([
-        api.get("/portfolio/profile/"),
-      ])
-      const profileData = profileRes.data as ProfileData
-      setHiddenRepos(profileData.hidden_github_repos || [])
+  const loadRepos = async () => {
+    const profileRes = await api.get("/portfolio/profile/")
+    const profileData = profileRes.data as ProfileData
 
-      // Fetch GitHub repos via our own API or directly
-      const username = process.env.NEXT_PUBLIC_GITHUB_USERNAME || ""
-      if (username) {
-        const ghRes = await fetch(
-          `https://api.github.com/users/${username}/repos?sort=updated&per_page=30&type=public`
-        )
-        if (ghRes.ok) {
-          const data = await ghRes.json()
-          setRepos(data.filter((r: GitHubRepo & { fork: boolean }) => !r.fork))
-        }
+    let repos: GitHubRepo[] = []
+
+    const username = process.env.NEXT_PUBLIC_GITHUB_USERNAME || ""
+    if (username) {
+      const ghRes = await fetch(
+        `https://api.github.com/users/${username}/repos?sort=updated&per_page=30&type=public`
+      )
+
+      if (ghRes.ok) {
+        const data = await ghRes.json()
+        repos = data.filter((r: GitHubRepo & { fork: boolean }) => !r.fork)
       }
+    }
+
+    return {
+      repos,
+      hiddenRepos: profileData.hidden_github_repos || [],
+    }
+  }
+
+  const handleRefresh = async () => {
+    setLoading(true)
+
+    try {
+      const { repos, hiddenRepos } = await loadRepos()
+      setRepos(repos)
+      setHiddenRepos(hiddenRepos)
     } catch {
       toast.error("Failed to load repos")
     } finally {
@@ -55,7 +66,36 @@ export default function GitHubReposPage() {
     }
   }
 
-  useEffect(() => { fetchAll() }, [])
+  useEffect(() => {
+    let mounted = true
+
+    async function init() {
+      setLoading(true)
+
+      try {
+        const { repos, hiddenRepos } = await loadRepos()
+
+        if (!mounted) return
+
+        setRepos(repos)
+        setHiddenRepos(hiddenRepos)
+      } catch {
+        if (mounted) {
+          toast.error("Failed to load repos")
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false)
+        }
+      }
+    }
+
+    void init()
+
+    return () => {
+      mounted = false
+    }
+  }, [])
 
   const toggleRepo = (repoName: string) => {
     setHiddenRepos((prev) =>
@@ -90,7 +130,7 @@ export default function GitHubReposPage() {
         description={`${visibleCount} of ${repos.length} shown on portfolio`}
         actions={
           <div className="flex items-center gap-2">
-            <button onClick={fetchAll}
+            <button onClick={handleRefresh}
               className="p-1.5 border border-zinc-800 rounded-lg text-zinc-500
                          hover:text-white transition-colors">
               <RefreshCw className="w-3.5 h-3.5" />

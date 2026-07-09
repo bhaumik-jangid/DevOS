@@ -1,7 +1,6 @@
 "use client"
 
 import Link from "next/link"
-import { motion } from "framer-motion"
 import { ArrowUpRight, GitBranch } from "lucide-react"
 import { Project } from "@/types/portfolio"
 
@@ -65,25 +64,26 @@ export function ProjectCard({ project }: { project: Project }) {
       {hasLinks && (
         <div className="flex items-center gap-2 px-5 py-3 border-t border-zinc-800/40">
           {project.live_url && (
-            
+            <a
               href={project.live_url}
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="flex items-center gap-1.5 text-xs text-zinc-500
-                         hover:text-white transition-colors">
+              className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-white transition-colors"
+            >
               <ArrowUpRight className="w-3.5 h-3.5" />
               Live
             </a>
           )}
+
           {project.github_url && (
-            
+            <a
               href={project.github_url}
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="flex items-center gap-1.5 text-xs text-zinc-500
-                         hover:text-white transition-colors ml-auto">
+              className="ml-auto flex items-center gap-1.5 text-xs text-zinc-500 hover:text-white transition-colors"
+            >
               <GitBranch className="w-3.5 h-3.5" />
               Source
             </a>
