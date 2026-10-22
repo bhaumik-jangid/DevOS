@@ -66,6 +66,7 @@ export async function getGitHubPinnedRepos(hiddenRepos: string[] = []): Promise<
       body: JSON.stringify({ query }),
       next: { revalidate: 3600 },
     })
+    console.log("getGitHubPinnedRepos", { res, hidden })
 
     if (res.ok) {
       const data = await res.json()

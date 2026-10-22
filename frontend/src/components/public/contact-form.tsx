@@ -155,7 +155,7 @@ export function ContactForm({ page = "/" }: ContactFormProps) {
         disabled={sending}
         className="flex items-center gap-2 bg-amber-500 hover:bg-amber-400
                    disabled:bg-amber-500/40 text-black text-sm font-medium
-                   px-4 py-2.5 rounded-lg transition-colors min-h-[48px]">
+                   px-4 py-2.5 rounded-lg transition-colors min-h-12">
         {sending
           ? <><Loader2 className="w-4 h-4 animate-spin" />Sending</>
           : <><Send className="w-4 h-4" />Send message</>

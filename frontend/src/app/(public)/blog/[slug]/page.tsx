@@ -11,7 +11,9 @@ interface PageProps {
 
 export async function generateStaticParams(): Promise<{ slug: string }[]> {
   const posts = await getBlogPosts()
-  return posts.map((p: BlogPost) => ({ slug: p.slug }))
+  return posts
+    .filter((p: BlogPost) => p.slug && p.slug.trim() !== "")
+    .map((p: BlogPost) => ({ slug: p.slug }))
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {

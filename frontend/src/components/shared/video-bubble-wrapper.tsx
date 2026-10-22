@@ -8,15 +8,21 @@ export function VideoBubbleWrapper() {
   const [tooltips, setTooltips] = useState<string[]>([])
 
   useEffect(() => {
-    const API = process.env.NEXT_PUBLIC_API_URL || "/api/v1"
+    const API = (process.env.NEXT_PUBLIC_API_URL || "/api/v1").replace(/\/$/, "")
+    const BACKEND = API.replace("/api/v1", "")
+
     fetch(`${API}/portfolio/profile/`)
-      .then((r) => r.json())
+      .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
+        if (!data) return
         if (data.hero_video) {
-          setVideoUrl(data.hero_video)
+          const url = String(data.hero_video).startsWith("http")
+            ? data.hero_video
+            : `${BACKEND}${data.hero_video}`
+          setVideoUrl(url)
         }
         if (Array.isArray(data.video_tooltips) && data.video_tooltips.length > 0) {
-          setTooltips(data.video_tooltips)
+          setTooltips(data.video_tooltips as string[])
         }
       })
       .catch(() => {})

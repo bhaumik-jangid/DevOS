@@ -26,8 +26,14 @@ async function fetcher<T>(path: string): Promise<T> {
 export const getProfile = () => fetcher<Profile>("/portfolio/profile/")
 export const getAcademic = () => fetcher<Academic[]>("/portfolio/academic/")
 export const getAchievements = () => fetcher<Achievement[]>("/portfolio/achievements/")
-export const getFeaturedProjects = () => fetcher<Project[]>("/projects/?featured=true")
-export const getProjects = () => fetcher<Project[]>("/projects/")
+export const getFeaturedProjects = async (): Promise<Project[]> => {
+  const data = await fetcher<Project[]>("/projects/?featured=true")
+  return data.filter((p: Project) => Boolean(p.slug))
+}
+export const getProjects = async (): Promise<Project[]> => {
+  const data = await fetcher<Project[]>("/projects/")
+  return data.filter((p: Project) => Boolean(p.slug))
+}
 export const getProject = (slug: string) => fetcher<Project>(`/projects/${slug}/`)
 export const getSkills = () => fetcher<Skill[]>("/portfolio/skills/")
 export const getExperience = () => fetcher<Experience[]>("/portfolio/experience/")
