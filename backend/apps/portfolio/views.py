@@ -177,8 +177,18 @@ class ContactFormView(APIView):
 
 
 class ContactSubmissionListView(APIView):
-    """Admin only — view all contact submissions."""
+    """Admin only — view and delete contact submissions."""
     permission_classes = [IsAuthenticated]
+
+    def delete(self, request, pk: int = None):
+        if pk is None:
+            return Response({"detail": "ID required"}, status=400)
+        try:
+            submission = ContactSubmission.objects.get(pk=pk)
+            submission.delete()
+            return Response({"deleted": True}, status=204)
+        except ContactSubmission.DoesNotExist:
+            return Response({"detail": "Not found"}, status=404)
 
     def get(self, request):
         submissions = ContactSubmission.objects.all()

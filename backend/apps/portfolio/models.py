@@ -17,6 +17,11 @@ class Profile(models.Model):
     photo_secondary = models.ImageField(upload_to="photos/", null=True, blank=True)
     hero_video = models.URLField(null=True, blank=True)
     video_tooltips = models.JSONField(default=list, blank=True)
+    hidden_github_repos = models.JSONField(
+        default=list,
+        blank=True,
+        help_text="List of GitHub repo names to hide from portfolio",
+    )
     available_for_work = models.BooleanField(default=True)
     years_of_experience = models.IntegerField(default=0)
 

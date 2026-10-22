@@ -22,8 +22,12 @@ fi
 
 echo ""
 echo "--- Backend lint ---"
-docker compose exec -T backend flake8 apps/ --max-line-length=100 --exclude=migrations -q
-if [ $? -ne 0 ]; then
+if ! docker compose exec -T backend flake8 apps/ \
+    --max-line-length=100 \
+    --exclude=migrations \
+    --statistics \
+    --show-source \
+    --count; then
   echo "FAILED: Linting failed."
   exit 1
 fi

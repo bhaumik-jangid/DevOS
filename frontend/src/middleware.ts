@@ -1,26 +1,65 @@
 import { NextRequest, NextResponse } from "next/server"
 
-const ADMIN_ROUTES = ["/dashboard"]
-const PUBLIC_ONLY_ROUTES = ["/login"]
+// Strip protocol and trailing slash
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://bhaumikjangid.me")
+  .replace(/^https?:\/\//, "")
+  .replace(/\/$/, "")
 
-export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
-  const accessToken = request.cookies.get("access_token")?.value
+const MAIN_DOMAIN = SITE_URL.startsWith("www.")
+  ? SITE_URL.slice(4)
+  : SITE_URL
 
-  const isAdminRoute = ADMIN_ROUTES.some((r) => pathname.startsWith(r))
-  const isPublicOnly = PUBLIC_ONLY_ROUTES.includes(pathname)
+const BACKEND_URL = process.env.BACKEND_INTERNAL_URL || "https://devos-i1p2.onrender.com"
 
-  if (isAdminRoute && !accessToken) {
-    return NextResponse.redirect(new URL("/login", request.url))
+const RESERVED = new Set(["www", "api", "mail", "dev", "staging", "admin", "app"])
+
+export async function middleware(request: NextRequest) {
+  const host = request.headers.get("host") || ""
+
+  // Only handle subdomains of our main domain
+  if (!host.endsWith(`.${MAIN_DOMAIN}`)) {
+    return NextResponse.next()
   }
 
-  if (isPublicOnly && accessToken) {
-    return NextResponse.redirect(new URL("/dashboard", request.url))
+  const alias = host.replace(`.${MAIN_DOMAIN}`, "").toLowerCase()
+
+  if (!alias || RESERVED.has(alias)) {
+    return NextResponse.next()
   }
 
-  return NextResponse.next()
+  try {
+    const res = await fetch(
+      `${BACKEND_URL}/api/v1/projects/alias/${alias}/`,
+      {
+        headers: {
+          "User-Agent": "DevOS-Middleware/1.0",
+          "Accept": "application/json",
+        },
+        signal: AbortSignal.timeout(4000),
+      }
+    )
+
+    if (res.ok) {
+      const data = await res.json() as { live_url?: string }
+      if (data.live_url) {
+        return NextResponse.redirect(data.live_url, {
+          status: 302,
+          headers: {
+            "Cache-Control": "no-store",
+          },
+        })
+      }
+    }
+  } catch {
+    // Backend unreachable — fall through to portfolio
+  }
+
+  // No alias found — send to main portfolio
+  return NextResponse.redirect(`https://${MAIN_DOMAIN}`, { status: 302 })
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/login"],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon\\.ico|api/).*)",
+  ],
 }

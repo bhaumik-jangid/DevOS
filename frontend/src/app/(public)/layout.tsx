@@ -41,7 +41,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
   const config = await getSiteConfig()
-
+  
   return (
     <div className="min-h-screen bg-[#111113] text-white">
       <PageTracker />

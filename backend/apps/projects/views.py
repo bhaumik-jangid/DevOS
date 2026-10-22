@@ -2,6 +2,7 @@ from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .models import Project
 from .serializers import ProjectSerializer, ProjectDetailSerializer, ProjectWriteSerializer
+from rest_framework.response import Response
 
 
 class ProjectListView(generics.ListCreateAPIView):
@@ -49,3 +50,28 @@ class ProjectDetailView(generics.RetrieveUpdateDestroyAPIView):
         if str(lookup).isdigit():
             return generics.get_object_or_404(queryset, id=lookup)
         return generics.get_object_or_404(queryset, slug=lookup)
+
+
+class ProjectAliasRedirectView(generics.GenericAPIView):
+    """
+    GET /api/v1/projects/alias/<alias>/
+    Returns the live_url for a project with the given alias (or slug).
+    Used by Vercel middleware to redirect subdomain traffic.
+    """
+    permission_classes = [AllowAny]
+
+    def get(self, request, alias: str):
+        project = (
+            Project.objects.filter(alias=alias, is_public=True).first()
+            or Project.objects.filter(slug=alias, is_public=True).first()
+        )
+        if not project:
+            return Response({"detail": "Not found"}, status=404)
+        if not project.live_url:
+            return Response({"detail": "No live URL configured"}, status=404)
+        print(f"Redirecting alias '{alias}' to live URL: {project.live_url}")
+        return Response({
+            "alias": alias,
+            "project": project.name,
+            "live_url": project.live_url,
+        })

@@ -27,6 +27,7 @@ urlpatterns = [
     path("blog/<int:pk>/", BlogPostAdminDetailView.as_view()),
     path("contact/", ContactFormView.as_view()),
     path("contact/submissions/", ContactSubmissionListView.as_view()),
+    path("contact/submissions/<int:pk>/", ContactSubmissionListView.as_view()),
     path("config/", SiteConfigView.as_view()),
     path("config/update/", SiteConfigView.as_view()),
     path("skills/admin/", SkillAdminView.as_view()),

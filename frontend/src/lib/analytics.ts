@@ -1,17 +1,18 @@
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8090/api/v1"
-
-export async function trackPageView(path: string) {
+export async function trackPageView(path: string): Promise<void> {
+  if (typeof window === "undefined") return
   try {
-    console.log("api call to :", `${API}/core/track////`)
-    await fetch(`${API}/core/track////`, {
+    const API = process.env.NEXT_PUBLIC_API_URL || "/api/v1"
+    const url = API.endsWith("/") ? `${API}core/track/` : `${API}/core/track/`
+    await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         path,
-        referrer: typeof document !== "undefined" ? document.referrer : "",
+        referrer: document.referrer || "",
+        user_agent: navigator.userAgent || "",
       }),
     })
   } catch {
-    // Silent fail — never break the page for analytics
+    // Non-critical — fail silently
   }
 }

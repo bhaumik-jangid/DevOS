@@ -7,7 +7,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         model = Project
         fields = [
             "id", "name", "slug", "description", "stack_tags",
-            "github_url", "live_url", "cover_image", "status",
+            "github_url", "live_url", "alias", "cover_image", "status",
             "hosting_provider", "is_featured", "is_public", "order",
         ]
 
@@ -25,7 +25,7 @@ class ProjectWriteSerializer(serializers.ModelSerializer):
         model = Project
         fields = [
             "name", "slug", "description", "long_description",
-            "stack_tags", "github_url", "live_url", "status",
+            "stack_tags", "github_url", "live_url", "alias", "status",
             "hosting_provider", "frontend_url", "backend_url",
             "health_endpoint", "deployment_type", "docker_enabled",
             "ci_cd_enabled", "notes", "is_featured", "is_public", "order",

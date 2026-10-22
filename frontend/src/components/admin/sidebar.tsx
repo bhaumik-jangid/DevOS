@@ -8,7 +8,8 @@ import {
   Terminal, LayoutDashboard, FolderGit2, Activity,
   Layers, LogOut, ChevronRight, Rocket,
   BarChart2, MessageSquare, BookOpen, Cpu, Bot,
-  Settings, Link2, Tv, X, Menu
+  Settings, Link2, Tv, X, Menu,
+  GitBranch
 } from "lucide-react"
 import { useAuthStore } from "@/lib/auth-store"
 import { api } from "@/lib/api"
@@ -30,6 +31,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
   { href: "/dashboard/portfolio", label: "Portfolio", icon: Layers, service: "portfolio" },
   { href: "/dashboard/contacts", label: "Contacts", icon: MessageSquare, service: "portfolio" },
   { href: "/dashboard/analytics", label: "Analytics", icon: BarChart2 },
+  { href: "/dashboard/github", label: "GitHub Repos", icon: GitBranch },
   { href: "/dashboard/shortener", label: "URL Shortener", icon: Link2, service: "shortener" },
   { href: "/dashboard/watchlist", label: "Watchlist", icon: Tv, service: "watchlist" },
   { href: "/dashboard/mcp", label: "MCP Tools", icon: Cpu, service: "mcp" },
