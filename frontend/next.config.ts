@@ -1,32 +1,6 @@
 import type { NextConfig } from "next"
 
-const BACKEND_URL =
-  process.env.BACKEND_INTERNAL_URL ||
-  "https://devos-i1p2.onrender.com"
-
 const nextConfig: NextConfig = {
-  async rewrites() {
-    return [
-      // Proxy everything under /api/ to Render backend
-      // This must be listed BEFORE any other rules
-      {
-        source: "/api/health",
-        destination: `${BACKEND_URL}/api/health`,
-      },
-      {
-        source: "/api/v1/:path*",
-        destination: `${BACKEND_URL}/api/v1/:path*`,
-      },
-      {
-        source: "/media/:path*",
-        destination: `${BACKEND_URL}/media/:path*`,
-      },
-      {
-        source: "/s/:code",
-        destination: `${BACKEND_URL}/s/:code/`,
-      },
-    ]
-  },
   images: {
     remotePatterns: [
       { protocol: "http", hostname: "localhost", pathname: "/media/**" },

@@ -41,3 +41,5 @@ DATABASES["default"]["OPTIONS"] = {
 
 # Disable redirect loops through Vercel proxy
 APPEND_SLASH = False
+
+CORS_ALLOW_CREDENTIALS = False
